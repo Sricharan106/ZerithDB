@@ -13,11 +13,24 @@ import type { BackupExportOptions, BackupSnapshot } from "./backup.js";
 
 const RESERVED_FIELDS = ["_id", "_createdAt", "_updatedAt"];
 
+/**
+ * A handle to a single named collection within the ZerithDB local database.
+ * All operations are async and backed by IndexedDB.
+ */
+
 export class CollectionClient<T extends Record<string, any> = Record<string, any>> {
   constructor(
     private readonly table: Table<Document<T>>,
     private readonly collectionName: string
   ) {}
+
+  /**
+   * Subscribe to changes in the collection.
+   * Uses Dexie's liveQuery to reactively notify when documents change.
+   *
+   * @param callback - Function called with the updated list of all documents
+   * @returns An unsubscribe function
+   */
 
   subscribe(callback: (documents: Document<T>[]) => void): () => void {
     const observable = liveQuery(() => this.find());
@@ -29,6 +42,13 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
     return () => subscription.unsubscribe();
   }
+
+  /**
+   * Insert a document if it doesn't exist, or update it if it does.
+   * Automatically manages timestamps.
+   * insted of add we use put
+   * put() inserts OR replace/update automatically
+   */
 
   private validateDocument(document: unknown): void {
     if (document === null || document === undefined) {
@@ -88,6 +108,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     );
   }
 
+  /**
+   * Insert a new document into the collection.
+   * Automatically assigns `_id`, `_createdAt`, and `_updatedAt`.
+   */
+
   async insert(document: T): Promise<InsertResult> {
     this.validateDocument(document);
 
@@ -113,6 +138,10 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       }
     );
   }
+
+  /**
+   * Insert multiple documents in a single atomic operation.
+   */
 
   async insertMany(documents: T[]): Promise<InsertResult[]> {
     if (!Array.isArray(documents)) {
@@ -146,6 +175,17 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     );
   }
 
+  /**
+   * Find documents matching a filter.
+   * All filter fields are ANDed together.
+   *
+   * @example
+   * ```typescript
+   * const active = await todos.find({ done: false });
+   * const high = await todos.find({ priority: { $gte: 3 } });
+   * ```
+   */
+
   async find(filter: QueryFilter<T> = {}): Promise<Document<T>[]> {
     this.validateFilter(filter);
 
@@ -159,6 +199,10 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       }
     );
   }
+
+  /**
+   * Find a single document by its `_id`.
+   */
 
   async findById(id: string): Promise<Document<T> | undefined> {
     if (!id || typeof id !== "string") {
@@ -179,6 +223,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       }
     );
   }
+
+  /**
+   * Update documents matching a filter.
+   * Returns the number of updated documents.
+   */
 
   async update(filter: QueryFilter<T>, spec: UpdateSpec<T>): Promise<number> {
     this.validateFilter(filter);
@@ -210,6 +259,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     );
   }
 
+  /**
+   * Delete documents matching a filter.
+   * Returns the number of deleted documents.
+   */
+
   async delete(filter: QueryFilter<T>): Promise<number> {
     this.validateFilter(filter);
 
@@ -230,6 +284,10 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     );
   }
 
+  /**
+   * Delete every document in the collection.
+   */
+
   async clearAll(): Promise<void> {
     return wrapIDBOperation(
       ErrorCode.DB_DELETE_FAILED,
@@ -238,10 +296,14 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     );
   }
 
+  /** Alias for {@link clearAll} */
   async clear(): Promise<void> {
     return this.clearAll();
   }
 
+  /**
+   * Count documents matching a filter.
+   */
   async count(filter: QueryFilter<T> = {}): Promise<number> {
     const docs = await this.find(filter);
     return docs.length;
@@ -275,6 +337,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         continue;
       }
 
+      // Distinguish operator objects ({ $gt: 3 }) from plain object values ({ key: "v" }).
+      // Only treat as operators if at least one key starts with "$".
       const conditions = condition as Record<string, any>;
 
       for (const op of Object.keys(conditions)) {
@@ -331,6 +395,10 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   }
 }
 
+/**
+ * Internal Dexie subclass that manages dynamic collection creation.
+ * Collections are added lazily via schema version upgrades.
+ */
 class ZerithDBDexie extends Dexie {
   private readonly tableMap = new Map<string, Table>();
   private _currentSchema: Record<string, string> = {};
@@ -340,6 +408,13 @@ class ZerithDBDexie extends Dexie {
     super(`zerithdb_${appId}`);
   }
 
+  /**
+   * Ensure a named collection exists, creating it via a Dexie version
+   * upgrade if it has not been registered yet.
+   *
+   * @param name - The collection name to create or retrieve
+   * @returns The Dexie {@link Table} handle for the collection
+   */
   ensureCollection(name: string): Table {
     if (!name || typeof name !== "string" || !name.trim()) {
       throw new ZerithDBError(ErrorCode.DB_INIT_FAILED, "Collection name cannot be empty");
@@ -348,6 +423,7 @@ class ZerithDBDexie extends Dexie {
     if (!this.tableMap.has(name)) {
       this._currentSchema[name] = "_id, _createdAt, _updatedAt";
 
+      // We must increment the version for every new collection added dynamically
       const nextVersion = Math.max(this.verno, this._pendingVersion) + 1;
 
       this._pendingVersion = nextVersion;
@@ -365,6 +441,10 @@ class ZerithDBDexie extends Dexie {
   }
 }
 
+/**
+ * Internal database client. Wraps Dexie and manages collection instances.
+ * Use via {@link ZerithDBApp.db} — not instantiated directly.
+ */
 export class DbClient {
   private readonly dexie: ZerithDBDexie;
   private readonly appId: string;
@@ -419,14 +499,24 @@ export class DbClient {
     return { recordCount, collections };
   }
 
+  /**
+   * Returns names of collections that have been opened in this session.
+   */
   collectionNames(): string[] {
     return Array.from(this.collections.keys());
   }
 
+  /**
+   * Returns names of all collections currently stored in IndexedDB.
+   */
   allCollectionNames(): string[] {
     return this.dexie.tables.map((t) => t.name);
   }
 
+  /**
+   * Export all collections to a JSON-serializable snapshot.
+   * If options.collections is omitted, it exports ALL collections found in IndexedDB.
+   */
   async exportSnapshot(options: BackupExportOptions = {}): Promise<BackupSnapshot> {
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
