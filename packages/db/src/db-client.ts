@@ -234,12 +234,19 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   async update(filter: QueryFilter<T>, spec: UpdateSpec<T>): Promise<number> {
     this.validateFilter(filter);
 
-    if (!spec || typeof spec !== "object") {
+    if (spec === null || spec === undefined || typeof spec !== "object") {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Update spec must be a valid object");
     }
 
-    if (!spec.$set && !spec.$unset) {
-      throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Update spec must contain $set or $unset");
+    const hasSet = spec.$set && Object.keys(spec.$set).length > 0;
+
+    const hasUnset = spec.$unset && Object.keys(spec.$unset).length > 0;
+
+    if (!hasSet && !hasUnset) {
+      throw new ZerithDBError(
+        ErrorCode.DB_WRITE_FAILED,
+        "Update spec must contain non-empty $set or $unset"
+      );
     }
 
     return wrapIDBOperation(
@@ -249,7 +256,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         const matches = await this.find(filter);
 
         if (matches.length === 0) {
-          throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "No matching documents found");
+          return 0;
         }
 
         const now = Date.now();
