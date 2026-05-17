@@ -38,6 +38,37 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   }
 
   /**
+   * Insert a document if it doesn't exist, or update it if it does.
+   * Automatically manages timestamps.
+   * insted of add we use put
+   * put() inserts OR replace/update automatically
+   */
+
+  async upsert(document: Partial<T> & { _id?: string }): Promise<InsertResult> {
+    const now = Date.now();
+    const id = document._id ?? uuidv7();
+
+    const existing = await this.table.get(id);
+
+    const doc: Document<T> = {
+      ...(existing ?? {}),
+      ...document,
+      _id: id,
+      _createdAt: existing?._createdAt ?? now,
+      _updatedAt: now,
+    } as Document<T>;
+
+    return wrapIDBOperation(
+      ErrorCode.DB_WRITE_FAILED,
+      `Failed to upsert document in collection "${this.collectionName}"`,
+      async () => {
+        await this.table.put(doc);
+        return { id };
+      }
+    );
+  }
+
+  /**
    * Insert a new document into the collection.
    * Automatically assigns `_id`, `_createdAt`, and `_updatedAt`.
    */
