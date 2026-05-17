@@ -89,7 +89,7 @@ function isIndexedDBAvailable(): boolean {
 export function createApp(config: ZerithDBConfig): ZerithDBApp {
   if (!isIndexedDBAvailable()) {
     throw new ZerithDBError(
-      ErrorCode.SDK_UNSUPPORTED_ENVIRONMENT,
+      ErrorCode.SDK_NOT_INITIALIZED,
       "IndexedDB is unavailable in this browser environment. ZerithDB requires IndexedDB support. Try disabling private/incognito restrictions or use a supported browser."
     );
   }

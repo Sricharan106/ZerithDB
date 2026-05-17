@@ -99,8 +99,16 @@ jobs:
           primary_key  = os.environ.get('GROQ_API_KEY', '')
           fallback_key = os.environ.get('GROQ_API_KEY_FALLBACK', '')
           if not primary_key and not fallback_key:
-              print("ERROR: Neither GROQ_API_KEY nor GROQ_API_KEY_FALLBACK secret is set", file=sys.stderr)
-              sys.exit(1)
+              print("WARNING: Neither GROQ_API_KEY nor GROQ_API_KEY_FALLBACK is set. Skipping AI review.", file=sys.stderr)
+              review = {
+                  "verdict": "COMMENT",
+                  "summary": "AI Code Review was skipped because no Groq API key is configured.",
+                  "issues": [], "positives": [], "key_suggestion": "",
+                  "safe_to_merge": True, "suggested_labels": []
+              }
+              with open('review.json', 'w') as f:
+                  json.dump(review, f, indent=2)
+              sys.exit(0)
 
           url = "https://api.groq.com/openai/v1/chat/completions"
           payload = {
@@ -137,16 +145,26 @@ jobs:
                   print(f"✅ Groq request succeeded using {label} key")
                   break
               except urllib.error.HTTPError as e:
-                  body = e.read().decode()
+                  body = e.read().decode() if e.fp else str(e)
                   print(f"Groq API error {e.code} ({label} key): {body}", file=sys.stderr)
                   if e.code == 429 and label == "primary" and fallback_key:
                       print("Rate limit hit on primary key — retrying with fallback key…", file=sys.stderr)
-                      continue
-                  sys.exit(1)
+                  continue
+              except Exception as e:
+                  print(f"Groq API request failed ({label} key): {str(e)}", file=sys.stderr)
+                  continue
 
           if data is None:
-              print("ERROR: All Groq API keys exhausted or unavailable", file=sys.stderr)
-              sys.exit(1)
+              print("WARNING: All Groq API keys exhausted or unavailable. Skipping AI review.", file=sys.stderr)
+              review = {
+                  "verdict": "COMMENT",
+                  "summary": "AI Code Review was skipped because Groq API rate limits were exceeded or the service was unavailable.",
+                  "issues": [], "positives": [], "key_suggestion": "",
+                  "safe_to_merge": True, "suggested_labels": []
+              }
+              with open('review.json', 'w') as f:
+                  json.dump(review, f, indent=2)
+              sys.exit(0)
 
           text = data['choices'][0]['message']['content']
 

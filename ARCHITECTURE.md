@@ -34,6 +34,19 @@ Each package in `packages/` can be used standalone without the SDK wrapper. A de
 needs the DB engine can `import { createDb } from "zerithdb-db"` without pulling in sync or
 networking.
 
+## Recommended Reading Guide
+
+This document is designed for contributors, integrators, and developers who want a deeper understanding of ZerithDB internals.
+
+Suggested reading flow:
+
+1. Core Design Principles
+2. System Architecture Diagram
+3. Module Reference
+4. Data Flow Lifecycle
+5. Engineering Challenges
+
+Reading in this order provides a clearer understanding of how the different ZerithDB packages interact internally.
 ---
 
 ## System Architecture
@@ -143,7 +156,10 @@ to/from the network layer.
 - **Awareness** — Ephemeral user presence (cursor position, online status) via Yjs Awareness
   protocol — never persisted.
 - **Persistence** — On sync, the Yjs state vector is checkpointed to IndexedDB (via `zerithdb-db`).
-- **Delta Deduplication** - Identical updates are tracked and skipped before syncing data , so the same data is never sent to        peers more than once thereby avoiding redundant data movement.In this approach , only those fields that are updated recently       called delta are sent to peers instead of whole object.
+- **Delta Deduplication** - Identical updates are tracked and skipped before syncing data , so the
+  same data is never sent to peers more than once thereby avoiding redundant data movement.In this
+  approach , only those fields that are updated recently called delta are sent to peers instead of
+  whole object.
 
 **Sync flow:**
 

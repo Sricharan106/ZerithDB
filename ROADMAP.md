@@ -15,6 +15,15 @@
 | 📋     | Planned           |
 | 🔮     | Future / Research |
 
+## Roadmap Navigation
+
+- [Phase 0 — Foundation](#phase-0--foundation-v01--current)
+- [Phase 1 — Developer Experience](#phase-1--developer-experience-v02)
+- [Phase 2 — Reliability & Scale](#phase-2--reliability--scale-v03)
+- [Phase 3 — Access Control](#phase-3--access-control-v04)
+- [Phase 4 — Ecosystem & v10](#phase-4--ecosystem--v10-v10)
+- [Future / Research](#future--research)
+- [How to Influence the Roadmap](#how-to-influence-the-roadmap)
 ---
 
 ## Phase 0 — Foundation (v0.1) — **Current**
@@ -134,6 +143,21 @@ These are ideas we are tracking but not yet committed to:
 | **WASM CRDT engine**        | Compile Rust-based CRDT to WASM for 10x sync performance          |
 | **Cross-app data sharing**  | Standardized schemas for inter-app data portability               |
 
+## How Contributors Can Help
+
+Contributors can support ZerithDB development in several areas:
+
+- Improving onboarding and documentation
+- Expanding automated test coverage
+- Improving WebRTC reliability
+- Enhancing CRDT synchronization workflows
+- Building framework integrations
+- Improving accessibility and developer tooling
+- Optimizing local database performance
+
+New contributors are encouraged to explore issues labeled:
+- `good-first-issue`
+- `help-wanted`
 ---
 
 ## How to Influence the Roadmap

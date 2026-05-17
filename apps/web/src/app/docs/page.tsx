@@ -16,6 +16,8 @@ import {
   Globe,
   Zap,
   FileText,
+  Menu,
+  X,
 } from "lucide-react";
 
 type Framework = {
@@ -128,14 +130,18 @@ const DOC_CONTENT: Record<string, React.ReactNode> = {
         allows developers to build responsive, offline-capable applications without the latency and
         complexity of traditional cloud databases.
       </p>
-      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">Why Local-First?</h3>
+      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+        Why Local-First?
+      </h3>
       <p>
         Traditional web applications rely on a central server for every read and write operation.
         This means your app is only as fast as the network connection. Local-first applications
         reverse this paradigm: data is written to and read from a local database immediately, and
         then synced asynchronously in the background.
       </p>
-      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">Core Benefits</h3>
+      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+        Core Benefits
+      </h3>
       <ul className="list-disc pl-6 space-y-3">
         <li>
           <strong>Zero Latency:</strong> Operations happen locally at the speed of the device.
@@ -158,15 +164,21 @@ const DOC_CONTENT: Record<string, React.ReactNode> = {
         ZerithDB is available as a set of NPM packages. Depending on your stack, you can install the
         core SDK or framework-specific wrappers.
       </p>
-      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">Core JavaScript SDK</h3>
+      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+        Core JavaScript SDK
+      </h3>
       <div className="bg-slate-950/95 dark:bg-slate-950 p-4 rounded-lg text-slate-200 font-mono text-sm border border-slate-800/90">
         npm install zerithdb-sdk
       </div>
-      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">React & Next.js</h3>
+      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+        React & Next.js
+      </h3>
       <div className="bg-slate-950/95 dark:bg-slate-950 p-4 rounded-lg text-slate-200 font-mono text-sm border border-slate-800/90">
         npm install zerithdb-react
       </div>
-      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">Python Backend</h3>
+      <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+        Python Backend
+      </h3>
       <div className="bg-slate-950/95 dark:bg-slate-950 p-4 rounded-lg text-slate-200 font-mono text-sm border border-slate-800/90">
         pip install zerithdb
       </div>
@@ -318,6 +330,7 @@ export default function DocsPage() {
   const [activeSection, setActiveSection] = useState("Quickstart");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [copiedInstall, setCopiedInstall] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const activeFramework = FRAMEWORKS.find((f) => f.id === activeId) || FRAMEWORKS[0];
 
@@ -441,7 +454,9 @@ export default function DocsPage() {
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
               <Zap className="w-32 h-32" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-3 transition-colors duration-300">You&apos;re ready to build!</h3>
+            <h3 className="text-xl font-bold text-foreground mb-3 transition-colors duration-300">
+              You&apos;re ready to build!
+            </h3>
             <p className="text-muted-foreground mb-6 max-w-xl transition-colors duration-300">
               You&apos;ve successfully set up the foundation for a zero-backend application. Explore
               the advanced topics to unlock the full power of ZerithDB.
@@ -455,8 +470,12 @@ export default function DocsPage() {
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground text-sm transition-colors duration-300">Interactive Playground</div>
-                  <div className="text-xs text-muted-foreground transition-colors duration-300">Test offline/online sync locally</div>
+                  <div className="font-semibold text-foreground text-sm transition-colors duration-300">
+                    Interactive Playground
+                  </div>
+                  <div className="text-xs text-muted-foreground transition-colors duration-300">
+                    Test offline/online sync locally
+                  </div>
                 </div>
               </Link>
               <button
@@ -467,8 +486,12 @@ export default function DocsPage() {
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground text-sm transition-colors duration-300">Architecture Deep Dive</div>
-                  <div className="text-xs text-muted-foreground transition-colors duration-300">Learn how P2P CRDTs work</div>
+                  <div className="font-semibold text-foreground text-sm transition-colors duration-300">
+                    Architecture Deep Dive
+                  </div>
+                  <div className="text-xs text-muted-foreground transition-colors duration-300">
+                    Learn how P2P CRDTs work
+                  </div>
                 </div>
               </button>
             </div>
@@ -494,7 +517,9 @@ export default function DocsPage() {
           overhead, central database locking, and complex state reconciliation. ZerithDB bypasses
           all of this by utilizing advanced local-first patterns.
         </p>
-        <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">Key Mechanisms</h3>
+        <h3 className="text-2xl font-bold text-foreground mt-12 mb-4 transition-colors duration-300">
+          Key Mechanisms
+        </h3>
         <ul className="list-disc pl-6 space-y-3">
           <li>
             <strong>Optimistic Updates:</strong> The UI updates instantly without waiting for
@@ -510,7 +535,9 @@ export default function DocsPage() {
           </li>
         </ul>
         <div className="mt-12 p-6 bg-muted border border-border rounded-xl transition-colors duration-300">
-          <h4 className="font-semibold text-foreground mb-2 transition-colors duration-300">Note on Implementation</h4>
+          <h4 className="font-semibold text-foreground mb-2 transition-colors duration-300">
+            Note on Implementation
+          </h4>
           <p className="text-sm text-muted-foreground transition-colors duration-300">
             The specific API surface for {activeSection.toLowerCase()} is currently being
             standardized in the upcoming v1.0 release. Check back soon for detailed code snippets.
@@ -524,6 +551,13 @@ export default function DocsPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-300">
       <header className="bg-background border-b border-border px-6 h-16 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
         <div className="flex items-center gap-4">
+
+          <button
+            className="lg:hidden text-foreground"
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
           <Link
             href="/"
             className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 text-sm font-medium"
@@ -566,7 +600,63 @@ export default function DocsPage() {
         </div>
       </header>
 
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex-1 flex max-w-[1400px] mx-auto w-full">
+        <aside
+          className={`fixed top-0 left-0 h-full w-72 bg-background border-r border-border z-50 transform transition-transform duration-300 lg:hidden ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+        >
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="font-semibold text-foreground">Documentation</h2>
+
+            <button onClick={() => setMobileSidebarOpen(false)}>
+              <X className="w-5 h-5 text-foreground" />
+            </button>
+          </div>
+
+          <div className="space-y-8 p-6 overflow-y-auto">
+            {SIDEBAR_LINKS.map((section, idx) => {
+              const SectionIcon = section.icon;
+
+              return (
+                <div key={idx}>
+                  <h3 className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-3 flex items-center gap-2">
+                    <SectionIcon className="w-3.5 h-3.5" />
+                    {section.category}
+                  </h3>
+
+                  <ul className="flex flex-col gap-1.5 border-l border-border ml-1.5 pl-3">
+                    {section.items.map((item, i) => (
+                      <li key={i}>
+                        <button
+                          onClick={() => {
+                            setActiveSection(item);
+                            setMobileSidebarOpen(false);
+                          }}
+                          className={
+                            "text-sm font-medium transition-colors text-left w-full " +
+                            (item === activeSection
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "text-muted-foreground hover:text-foreground")
+                          }
+                        >
+                          {item}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+
         <aside className="w-72 border-r border-border py-8 pr-6 pl-6 hidden lg:block overflow-y-auto h-[calc(100vh-4rem)] sticky top-16 transition-colors duration-300">
           <div className="space-y-8">
             {SIDEBAR_LINKS.map((section, idx) => {
@@ -606,9 +696,13 @@ export default function DocsPage() {
         <main className="flex-1 py-10 px-6 lg:px-16 overflow-y-auto scroll-smooth">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors duration-300">
-              <span className="hover:text-foreground cursor-pointer transition-colors duration-300">Docs</span>
+              <span className="hover:text-foreground cursor-pointer transition-colors duration-300">
+                Docs
+              </span>
               <span>/</span>
-              <span className="text-foreground transition-colors duration-300">{activeSection}</span>
+              <span className="text-foreground transition-colors duration-300">
+                {activeSection}
+              </span>
             </div>
 
             <h1
@@ -688,10 +782,7 @@ export default function DocsPage() {
               </>
             ) : (
               <li>
-                <a
-                  href="#overview"
-                  className="text-blue-600 dark:text-blue-400 transition-colors"
-                >
+                <a href="#overview" className="text-blue-600 dark:text-blue-400 transition-colors">
                   Overview
                 </a>
               </li>

@@ -188,7 +188,7 @@ export class AuthManager extends EventEmitter<AuthEvents> {
     try {
       const privateKey = await recoverSecret(shards);
       const publicKeyBytes = await ed.getPublicKeyAsync(privateKey);
-      
+
       const identity = this.buildIdentity(publicKeyBytes);
       this._identity = identity;
       this.privateKeyBytes = privateKey;

@@ -10,7 +10,10 @@ interface SocialRecoveryRestoreProps {
   onRecovered?: () => void;
 }
 
-export default function SocialRecoveryRestore({ authManager, onRecovered }: SocialRecoveryRestoreProps) {
+export default function SocialRecoveryRestore({
+  authManager,
+  onRecovered,
+}: SocialRecoveryRestoreProps) {
   const [shards, setShards] = useState<string[]>(["", ""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,19 +23,23 @@ export default function SocialRecoveryRestore({ authManager, onRecovered }: Soci
     try {
       setLoading(true);
       setError(null);
-      
-      const validShards = shards.filter(s => s.trim().length > 0);
+
+      const validShards = shards.filter((s) => s.trim().length > 0);
       if (validShards.length < 2) {
         throw new Error("Please provide at least 2 shards to attempt recovery.");
       }
-      
+
       await authManager.recoverIdentity(validShards);
       setSuccess(true);
       if (onRecovered) {
         setTimeout(onRecovered, 2000);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Recovery failed. Invalid shards or insufficient threshold.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Recovery failed. Invalid shards or insufficient threshold."
+      );
     } finally {
       setLoading(false);
     }
@@ -105,7 +112,7 @@ export default function SocialRecoveryRestore({ authManager, onRecovered }: Soci
                 </motion.div>
               ))}
             </AnimatePresence>
-            
+
             <button
               onClick={addShard}
               className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
@@ -130,7 +137,7 @@ export default function SocialRecoveryRestore({ authManager, onRecovered }: Soci
 
           <button
             onClick={handleRecover}
-            disabled={loading || shards.filter(s => s.trim().length > 0).length < 2}
+            disabled={loading || shards.filter((s) => s.trim().length > 0).length < 2}
             className="w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors flex justify-center items-center gap-2"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reconstruct Master Key"}

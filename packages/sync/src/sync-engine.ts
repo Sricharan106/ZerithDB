@@ -7,6 +7,7 @@ import type { NetworkManager } from "zerithdb-network";
 import { InboxQueue } from "./queue/InboxQueue.js";
 import { OutboxQueue } from "./queue/OutboxQueue.js";
 import { bytesToBase64, base64ToBytes } from "zerithdb-utils";
+import { EphemeralStateManager } from "./ephemeral-state.js";
 
 type SyncEvents = {
   "state:change": SyncState;
@@ -20,6 +21,9 @@ type SyncEvents = {
  * Incoming peer deltas are applied to the Y.Doc, which reactively updates the DB.
  */
 export class SyncEngine extends EventEmitter<SyncEvents> {
+  /** Low-latency, non-persistent metadata sync for presence, media, and UI state. */
+  readonly ephemeral: EphemeralStateManager;
+
   private readonly docs = new Map<string, Y.Doc>();
   private readonly persistences = new Map<string, IndexeddbPersistence>();
   readonly outbox: OutboxQueue<Uint8Array>;
@@ -38,6 +42,7 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
     private readonly network: NetworkManager
   ) {
     super();
+    this.ephemeral = new EphemeralStateManager(config, network);
     this.outbox = new OutboxQueue(config.appId);
     this.inbox = new InboxQueue(config.appId);
     this.onPeerUpdate = this.onPeerUpdate.bind(this);
@@ -87,6 +92,7 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
     this.network.on("message", this.onPeerUpdate);
     this.network.on("peer:connected", this.onPeerConnected);
     this.network.on("peer:disconnected", this.onPeerDisconnected);
+    this.ephemeral.enable();
     this.updateState({ synced: true, connectedPeers: this.network.connectedPeerCount });
     void this.flushOutbox();
   }
@@ -97,6 +103,7 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
     this.network.off("message", this.onPeerUpdate);
     this.network.off("peer:connected", this.onPeerConnected);
     this.network.off("peer:disconnected", this.onPeerDisconnected);
+    this.ephemeral.disable();
     this.updateState({ synced: false, connectedPeers: 0 });
   }
 
@@ -193,6 +200,7 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
       document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     }
     this.disable();
+    this.ephemeral.dispose();
     if (this.syncTimer) {
       if (this.syncTimerIsRaf && typeof window !== "undefined" && window.cancelAnimationFrame) {
         window.cancelAnimationFrame(this.syncTimer);

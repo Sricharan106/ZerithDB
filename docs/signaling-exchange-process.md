@@ -26,7 +26,7 @@ channels. The signaling server is no longer involved in data transfer.
 
 ## High-Level Flow
 
-```text
+````text
 Peer A
    │
    ├── Connects to signaling server
@@ -54,7 +54,7 @@ Example from the implementation:
 const signalingUrl =
   this.config.sync?.signalingUrl ??
   "wss://arpitkhandelwal810-zerith-signaling.hf.space";
-```
+````
 
 The WebSocket connection includes:
 
@@ -162,7 +162,7 @@ networks or behind NATs.
 ZerithDB enables trickle ICE:
 
 ```ts
-trickle: true
+trickle: true;
 ```
 
 This allows candidates to be exchanged gradually instead of waiting for all candidates to be
@@ -183,10 +183,7 @@ peer.signal(msg.payload);
 For NAT traversal, ZerithDB uses public STUN servers:
 
 ```ts
-[
-  { urls: "stun:stun.l.google.com:19302" },
-  { urls: "stun:stun1.l.google.com:19302" }
-]
+[{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }];
 ```
 
 ---

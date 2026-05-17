@@ -103,7 +103,7 @@ function ClientCard({
     : "focus:ring-purple-500/20 focus:border-purple-500";
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col h-[600px]">
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[520px] max-h-[700px]">
       <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
         <div className="flex items-center gap-2 text-white">
           <Laptop className={`w-4 h-4 ${textColor}`} />
@@ -185,7 +185,7 @@ function ClientCard({
             value={client.input}
             onChange={(e) => onUpdateInput(client.id, e.target.value)}
             placeholder="Type a message offline/online..."
-            className={`flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${focusRingColor}`}
+            className={`flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${focusRingColor}`}
           />
           <button
             type="submit"
@@ -347,35 +347,36 @@ export default function PlaygroundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      {/* HEADER */}
-      <header className="bg-white border-b border-gray-200 px-6 h-16 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-hidden">
+      {/* HEADER - Fixed at top */}
+      <header className="bg-white border-b border-gray-200 px-4 md:px-6 h-16 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-sm overflow-hidden">
+        <div className="flex items-center gap-2 md:gap-4 flex-wrap min-w-0">
           <Link
             href="/"
-            className="text-gray-500 hover:text-black transition-colors flex items-center gap-2 text-sm font-medium"
+            className="text-gray-500 hover:text-black transition-colors flex items-center gap-1.5 text-sm font-medium shrink-0 group"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Home
+            <ArrowLeft className="w-3.5 h-3.5 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
+            <span className="truncate">Back</span>
           </Link>
-          <div className="h-4 w-px bg-gray-300"></div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center">
+          <div className="h-4 w-px bg-gray-300 shrink-0"></div>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0">
               <img src="/logo.svg" alt="ZerithDB Logo" className="w-full h-full" />
             </div>
-            <span className="font-semibold text-gray-900 text-lg tracking-tight">
-              Interactive Playground
+            <span className="font-semibold text-gray-900 text-base md:text-lg tracking-tight truncate">
+              ZerithDB
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
-            <ArrowRightLeft className="w-3.5 h-3.5" />
-            CRDT Sync Operations: {syncCount}
+        <div className="flex items-center gap-2 md:gap-4 flex-wrap md:flex-nowrap justify-end min-w-0">
+          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full shrink-0">
+            <ArrowRightLeft className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">CRDT Sync: {syncCount}</span>
           </div>
 
           <div
-            className={`hidden md:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full ${
+            className={`hidden md:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full shrink-0 ${
               peerStatus === "connected"
                 ? "bg-green-50 text-green-700"
                 : peerStatus === "connecting"
@@ -384,7 +385,7 @@ export default function PlaygroundPage() {
             }`}
           >
             <div
-              className={`w-2 h-2 rounded-full ${
+              className={`w-2 h-2 rounded-full shrink-0 ${
                 peerStatus === "connected"
                   ? "bg-green-500"
                   : peerStatus === "connecting"
@@ -392,28 +393,42 @@ export default function PlaygroundPage() {
                     : "bg-gray-400"
               }`}
             />
-            {peerStatus === "connected"
-              ? "Peers Connected"
-              : peerStatus === "connecting"
-                ? "Connecting to Peers..."
-                : "Peers Offline"}
+            <span className="truncate">
+              {peerStatus === "connected"
+                ? "Peers Connected"
+                : peerStatus === "connecting"
+                  ? "Connecting..."
+                  : "Offline"}
+            </span>
           </div>
           <button
             onClick={() => setIsOnline(!isOnline)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border ${
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border shrink-0 ${
               isOnline
                 ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                 : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
             }`}
           >
-            {isOnline ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-            {isOnline ? "Network: Online (P2P)" : "Network: Offline"}
+            {isOnline ? <Wifi className="w-4 h-4 shrink-0" /> : <WifiOff className="w-4 h-4 shrink-0" />}
+            <span className="hidden sm:inline">{isOnline ? "Online" : "Offline"}</span>
+            <span className="sm:hidden">{isOnline ? "Online" : "Offline"}</span>
           </button>
         </div>
       </header>
 
+      {/* Spacer to prevent content from hiding under fixed header */}
+      <div className="h-16"></div>
+
+      {/* TITLE SECTION */}
+      <div className="max-w-7xl mx-auto w-full px-4 md:px-6 pt-6 md:pt-8 pb-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+          Interactive Playground
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">Test CRDT synchronization in real-time</p>
+      </div>
+
       {/* MAIN PLAYGROUND */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6 grid md:grid-cols-2 gap-8 items-start mt-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 pt-2 md:pt-4 grid md:grid-cols-2 gap-6 md:gap-8 items-start overflow-x-hidden">
         {clients.map((client) => (
           <ClientCard
             key={client.id}
@@ -427,18 +442,18 @@ export default function PlaygroundPage() {
       </main>
 
       {/* INFO FOOTER */}
-      <div className="max-w-3xl mx-auto text-center pb-12 px-6">
+      <div className="max-w-3xl mx-auto text-center pb-12 px-4 md:px-6 overflow-x-hidden">
         <h3 className="font-semibold text-gray-900 mb-2">How to test the Playground:</h3>
-        <ul className="text-sm text-gray-500 flex flex-col gap-2">
+        <ul className="text-sm text-gray-500 flex flex-col gap-2 break-words">
           {INSTRUCTIONS.map((instruction, index) => (
-            <li key={index}>
+            <li key={index} className="break-words">
               {index + 1}.{" "}
               {typeof instruction === "string" ? (
                 instruction
               ) : (
                 <>
                   Click the{" "}
-                  <strong className={`text-${instruction.highlightColor}-600`}>
+                  <strong className={`text-${instruction.highlightColor}-600 whitespace-nowrap`}>
                     {instruction.highlight}
                   </strong>{" "}
                   {instruction.text.replace(instruction.highlight, "").trim()}
@@ -451,7 +466,7 @@ export default function PlaygroundPage() {
 
       {/* Toast Notifications */}
       <div
-        className="fixed bottom-6 right-6 flex flex-col gap-2 pointer-events-none"
+        className="fixed bottom-4 md:bottom-6 right-4 md:right-6 flex flex-col gap-2 pointer-events-none max-w-[calc(100%-2rem)] md:max-w-md z-50"
         role="status"
         aria-live="polite"
         aria-atomic="true"
@@ -459,18 +474,18 @@ export default function PlaygroundPage() {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto ${
+            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto break-words min-w-0 ${
               toast.type === "success"
                 ? "bg-black text-white"
                 : "bg-red-100 text-red-900 border border-red-200"
             }`}
           >
             {toast.type === "success" ? (
-              <Check className="w-4 h-4 text-green-400" />
+              <Check className="w-4 h-4 text-green-400 shrink-0" />
             ) : (
-              <span className="text-lg">✕</span>
+              <span className="text-lg shrink-0">✕</span>
             )}
-            <span className="text-sm font-medium">{toast.message}</span>
+            <span className="text-sm font-medium truncate">{toast.message}</span>
           </div>
         ))}
       </div>
