@@ -22,35 +22,35 @@
 
 ZerithDB provides multiple packages for building collaborative and offline-first applications.
 
-| Package | Installation | Description |
-| --- | --- | --- |
-| `zerithdb-sdk` | `npm install zerithdb-sdk` | Main developer-facing SDK |
-| `zerithdb-db` | `npm install zerithdb-db` | IndexedDB adapter |
-| `zerithdb-sync` | `npm install zerithdb-sync` | CRDT sync engine |
-| `zerithdb-network` | `npm install zerithdb-network` | WebRTC networking layer |
-| `zerithdb-auth` | `npm install zerithdb-auth` | Authentication utilities |
-| `zerithdb-core` | `npm install zerithdb-core` | Shared internal utilities |
-| `zerithdb-cli` | `npm install -g zerithdb-cli` | CLI tooling |
-| `zerithdb-react` | `npm install zerithdb-react` | React integration package |
-| `zerithdb-python` | `pip install zerithdb-python` | Python SDK support |
+| Package            | Installation                   | Description               |
+| ------------------ | ------------------------------ | ------------------------- |
+| `zerithdb-sdk`     | `npm install zerithdb-sdk`     | Main developer-facing SDK |
+| `zerithdb-db`      | `npm install zerithdb-db`      | IndexedDB adapter         |
+| `zerithdb-sync`    | `npm install zerithdb-sync`    | CRDT sync engine          |
+| `zerithdb-network` | `npm install zerithdb-network` | WebRTC networking layer   |
+| `zerithdb-auth`    | `npm install zerithdb-auth`    | Authentication utilities  |
+| `zerithdb-core`    | `npm install zerithdb-core`    | Shared internal utilities |
+| `zerithdb-cli`     | `npm install -g zerithdb-cli`  | CLI tooling               |
+| `zerithdb-react`   | `npm install zerithdb-react`   | React integration package |
+| `zerithdb-python`  | `pip install zerithdb-python`  | Python SDK support        |
 
 ---
 
 ## Table of Contents
 
-* [What is ZerithDB?](#what-is-zerithdb)
-* [Why ZerithDB?](#why-zerithdb)
-* [The 30-Second Demo](#the-30-second-demo)
-* [Features](#features)
-* [Quick Start](#quick-start)
-* [Architecture in One Diagram](#architecture-in-one-diagram)
-* [Packages](#packages)
-* [CLI Reference](#cli-reference)
-* [FAQ](#faq)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [Community](#community)
-* [License](#license)
+- [What is ZerithDB?](#what-is-zerithdb)
+- [Why ZerithDB?](#why-zerithdb)
+- [The 30-Second Demo](#the-30-second-demo)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Architecture in One Diagram](#architecture-in-one-diagram)
+- [Packages](#packages)
+- [CLI Reference](#cli-reference)
+- [FAQ](#faq)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Community](#community)
+- [License](#license)
 
 ---
 
@@ -166,7 +166,8 @@ const app = createApp({
 
 ## Documentation Navigation
 
-New contributors and developers can use the following documents to better understand the project structure and workflow:
+New contributors and developers can use the following documents to better understand the project
+structure and workflow:
 
 - [Architecture Overview](ARCHITECTURE.md)
 - [Roadmap](ROADMAP.md)
@@ -180,6 +181,7 @@ For the best onboarding experience:
 2. Explore the architecture documentation
 3. Review the roadmap for planned features
 4. Read contribution guidelines before contributing
+
 ### Local Cloud Backups
 
 ```typescript

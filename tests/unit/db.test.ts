@@ -39,25 +39,25 @@ describe("DbClient — CollectionClient", () => {
       expect(docs).toHaveLength(1);
       expect(docs[0]?._id).toBe(id);
       expect(docs[0]?.text).toBe("world");
-      }); 
-      it("should return empty array when collection has no documents", async () => {
-  const col = db.collection<{ text: string }>("empty");
+    });
+    it("should return empty array when collection has no documents", async () => {
+      const col = db.collection<{ text: string }>("empty");
 
-  const docs = await col.find({});
+      const docs = await col.find({});
 
-  expect(docs).toEqual([]);
-});
+      expect(docs).toEqual([]);
+    });
 
-it("should insert multiple documents correctly", async () => {
-  const col = db.collection<{ text: string }>("todos");
+    it("should insert multiple documents correctly", async () => {
+      const col = db.collection<{ text: string }>("todos");
 
-  await col.insert({ text: "one" });
-  await col.insert({ text: "two" });
+      await col.insert({ text: "one" });
+      await col.insert({ text: "two" });
 
-  const docs = await col.find({});
+      const docs = await col.find({});
 
-  expect(docs.length).toBe(2);
-});
+      expect(docs.length).toBe(2);
+    });
 
     it("should automatically inject _createdAt and _updatedAt timestamp fields into the newly inserted document", async () => {
       const before = Date.now();

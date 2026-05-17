@@ -24,6 +24,7 @@
 - [Phase 4 — Ecosystem & v10](#phase-4--ecosystem--v10-v10)
 - [Future / Research](#future--research)
 - [How to Influence the Roadmap](#how-to-influence-the-roadmap)
+
 ---
 
 ## Phase 0 — Foundation (v0.1) — **Current**
@@ -156,8 +157,10 @@ Contributors can support ZerithDB development in several areas:
 - Optimizing local database performance
 
 New contributors are encouraged to explore issues labeled:
+
 - `good-first-issue`
 - `help-wanted`
+
 ---
 
 ## How to Influence the Roadmap

@@ -192,12 +192,12 @@ jobs:
           print(f"✅ Review generated — verdict: {review.get('verdict')}, safe_to_merge: {review.get('safe_to_merge')}, labels: {review.get('suggested_labels')}")
           PYEOF
         env:
-          GROQ_API_KEY:          ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEY_FALLBACK: ${{ secrets.GROQ_API_KEY_FALLBACK }}
-          PR_TITLE:       ${{ github.event.issue.title || github.event.pull_request.title }}
-          PR_BODY:        ${{ github.event.issue.body || github.event.pull_request.body }}
-          PR_AUTHOR:      ${{ github.event.issue.user.login || github.event.pull_request.user.login }}
-          PR_NUMBER:      ${{ github.event.issue.number || github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.issue.title || github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.issue.body || github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.issue.user.login || github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
 
       - name: Apply labels
         run: |
@@ -225,9 +225,9 @@ jobs:
               print("✅ Labels applied successfully")
           PYEOF
         env:
-          GH_TOKEN:            ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          PR_NUMBER:           ${{ github.event.issue.number || github.event.pull_request.number }}
-          GITHUB_REPOSITORY:   ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Post review comment
         run: |
@@ -297,9 +297,9 @@ jobs:
               print("✅ Review comment posted", flush=True)
           PYEOF
         env:
-          GH_TOKEN:            ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          PR_NUMBER:           ${{ github.event.issue.number || github.event.pull_request.number }}
-          GITHUB_REPOSITORY:   ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Submit formal GitHub review
         # Posts an official approve/request-changes review from the maintainer account
@@ -333,7 +333,7 @@ jobs:
               print(f"✅ Formal review submitted: {verdict}", flush=True)
           PYEOF
         env:
-          GH_TOKEN:          ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          PR_NUMBER:         ${{ github.event.issue.number || github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         continue-on-error: true

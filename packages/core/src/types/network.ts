@@ -63,4 +63,3 @@ export interface MediaStreamMetadata {
   updatedAt: number;
   [key: string]: unknown;
 }
-

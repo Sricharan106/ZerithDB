@@ -79,4 +79,3 @@ export interface VideoParticipantState {
   streams: Record<string, MediaStreamMetadata>;
   updatedAt: number;
 }
-

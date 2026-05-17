@@ -20,11 +20,13 @@ export const ZerithProvider: React.FC<ZerithProviderProps> = ({ config, children
   const [client, setClient] = useState(() => createApp(config));
 
   // Dispose on unmount or when config changes (new client replaces old one)
-useEffect(() => {
-  const app = createApp(config);
-  setClient(app);
-  return () => { void app.dispose(); };
-}, [configStr]);
+  useEffect(() => {
+    const app = createApp(config);
+    setClient(app);
+    return () => {
+      void app.dispose();
+    };
+  }, [configStr]);
 
   return <ZerithContext.Provider value={client}>{children}</ZerithContext.Provider>;
 };

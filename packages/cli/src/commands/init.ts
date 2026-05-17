@@ -7,7 +7,6 @@ import prompts from "prompts";
 import { validateProjectName, getProjectNameError } from "../validate-project-name.js";
 import { writeFile } from "../utils/writeFile.js";
 
-
 const TEMPLATES: Record<string, string> = {
   todo: "todo-app",
   chat: "chat-app",

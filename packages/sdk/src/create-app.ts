@@ -1,13 +1,14 @@
 import { Logger } from "zerithdb-core";
-import type { ZerithDBConfig } from "zerithdb-core";
+import type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig } from "zerithdb-core";
+export type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig };
 import { MemoryCollector, estimateStorageBytes } from "zerithdb-devtools";
 import { ZerithDBError, ErrorCode } from "zerithdb-core";
-import { DbClient, CollectionClient } from "./db-client.js";
-import type { CloudBackupTarget, LocalCloudBackupOptions } from "./db-client.js";
-import { LocalCloudBackupAdapter } from "./db-client.js";
-import { SyncEngine } from "./sync-engine.js";
-import { AuthManager } from "./auth-manager.js";
-import { NetworkManager } from "./network-manager.js";
+import { DbClient, CollectionClient } from "zerithdb-db";
+import type { CloudBackupTarget, LocalCloudBackupOptions } from "zerithdb-db";
+import { LocalCloudBackupAdapter } from "zerithdb-db";
+import { SyncEngine } from "zerithdb-sync";
+import { AuthManager } from "zerithdb-auth";
+import { NetworkManager } from "zerithdb-network";
 
 /**
  * The root ZerithDB application instance returned by {@link createApp}.

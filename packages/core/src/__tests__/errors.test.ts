@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ZerithDBError, ErrorCode } from "../internal/errors.js";
+import { ZerithDBError, ErrorCode } from "zerithdb-errors";
 
 // ─── ErrorCode ────────────────────────────────────────────────────────────────
 

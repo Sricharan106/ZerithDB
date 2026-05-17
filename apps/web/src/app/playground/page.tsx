@@ -13,6 +13,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type ClientId = "A" | "B";
 
@@ -347,30 +348,30 @@ export default function PlaygroundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-muted/50 flex flex-col font-sans overflow-x-hidden">
       {/* HEADER - Fixed at top */}
-      <header className="bg-white border-b border-gray-200 px-4 md:px-6 h-16 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-sm overflow-hidden">
+      <header className="bg-background border-b border-border px-4 md:px-6 h-16 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-sm overflow-hidden">
         <div className="flex items-center gap-2 md:gap-4 flex-wrap min-w-0">
           <Link
             href="/"
-            className="text-gray-500 hover:text-black transition-colors flex items-center gap-1.5 text-sm font-medium shrink-0 group"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-sm font-medium shrink-0 group"
           >
             <ArrowLeft className="w-3.5 h-3.5 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
             <span className="truncate">Back</span>
           </Link>
-          <div className="h-4 w-px bg-gray-300 shrink-0"></div>
+          <div className="h-4 w-px bg-border shrink-0"></div>
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 flex items-center justify-center shrink-0">
               <img src="/logo.svg" alt="ZerithDB Logo" className="w-full h-full" />
             </div>
-            <span className="font-semibold text-gray-900 text-base md:text-lg tracking-tight truncate">
+            <span className="font-semibold text-foreground text-base md:text-lg tracking-tight truncate">
               ZerithDB
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 flex-wrap md:flex-nowrap justify-end min-w-0">
-          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full shrink-0">
+          <div className="hidden md:flex items-center gap-2 text-xs font-medium text-muted-foreground bg-muted px-3 py-1.5 rounded-full shrink-0">
             <ArrowRightLeft className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">CRDT Sync: {syncCount}</span>
           </div>
@@ -378,10 +379,10 @@ export default function PlaygroundPage() {
           <div
             className={`hidden md:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full shrink-0 ${
               peerStatus === "connected"
-                ? "bg-green-50 text-green-700"
+                ? "bg-green-500/10 text-green-600"
                 : peerStatus === "connecting"
-                  ? "bg-yellow-50 text-yellow-700"
-                  : "bg-gray-100 text-gray-500"
+                  ? "bg-yellow-500/10 text-yellow-600"
+                  : "bg-muted text-muted-foreground"
             }`}
           >
             <div
@@ -389,8 +390,8 @@ export default function PlaygroundPage() {
                 peerStatus === "connected"
                   ? "bg-green-500"
                   : peerStatus === "connecting"
-                    ? "bg-yellow-500 animate-pulse"
-                    : "bg-gray-400"
+                    ? "bg-yellow-500"
+                    : "bg-muted-foreground"
               }`}
             />
             <span className="truncate">
@@ -401,18 +402,25 @@ export default function PlaygroundPage() {
                   : "Offline"}
             </span>
           </div>
+
           <button
             onClick={() => setIsOnline(!isOnline)}
             className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border shrink-0 ${
               isOnline
-                ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                ? "bg-green-500/10 text-green-700 border-green-500/20 hover:bg-green-500/20"
+                : "bg-red-500/10 text-red-700 border-red-500/20 hover:bg-red-500/20"
             }`}
           >
-            {isOnline ? <Wifi className="w-4 h-4 shrink-0" /> : <WifiOff className="w-4 h-4 shrink-0" />}
+            {isOnline ? (
+              <Wifi className="w-4 h-4 shrink-0" />
+            ) : (
+              <WifiOff className="w-4 h-4 shrink-0" />
+            )}
             <span className="hidden sm:inline">{isOnline ? "Online" : "Offline"}</span>
             <span className="sm:hidden">{isOnline ? "Online" : "Offline"}</span>
           </button>
+
+          <ThemeToggle />
         </div>
       </header>
 

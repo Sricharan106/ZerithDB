@@ -36,7 +36,8 @@ networking.
 
 ## Recommended Reading Guide
 
-This document is designed for contributors, integrators, and developers who want a deeper understanding of ZerithDB internals.
+This document is designed for contributors, integrators, and developers who want a deeper
+understanding of ZerithDB internals.
 
 Suggested reading flow:
 
@@ -46,8 +47,7 @@ Suggested reading flow:
 4. Data Flow Lifecycle
 5. Engineering Challenges
 
-Reading in this order provides a clearer understanding of how the different ZerithDB packages interact internally.
----
+## Reading in this order provides a clearer understanding of how the different ZerithDB packages interact internally.
 
 ## System Architecture
 

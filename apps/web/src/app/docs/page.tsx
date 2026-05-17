@@ -371,7 +371,7 @@ export default function DocsPage() {
                 className={
                   "px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px " +
                   (activeId === fw.id
-                    ? "border-foreground text-foreground"
+                    ? "border-primary text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border")
                 }
               >
@@ -406,18 +406,22 @@ export default function DocsPage() {
 
           <div className="space-y-12">
             {activeFramework.steps.map((step, idx) => (
-              <div key={idx} className="relative">
-                <h3
-                  id={slugify(step.title)}
-                  className="text-lg font-bold text-foreground mb-2 scroll-mt-20 transition-colors duration-300"
-                >
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground mb-4 transition-colors duration-300">
+              <div key={idx} className="group">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 flex items-center justify-center text-xs font-bold border border-blue-100 dark:border-blue-800 transition-colors duration-300">
+                    {idx + 1}
+                  </div>
+                  <h3
+                    id={slugify(step.title)}
+                    className="text-lg font-bold text-foreground group-hover:text-blue-600 transition-colors scroll-mt-20 duration-300"
+                  >
+                    {step.title}
+                  </h3>
+                </div>
+                <p className="text-muted-foreground mb-4 ml-10 transition-colors duration-300">
                   {step.description}
                 </p>
-
-                <div className="rounded-xl border border-border overflow-hidden shadow-sm group transition-colors duration-300">
+                <div className="ml-10 relative group/code bg-muted border border-border rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
                   <div className="bg-muted border-b border-border px-4 py-2.5 flex items-center justify-between transition-colors duration-300">
                     <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
                       <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
@@ -437,7 +441,7 @@ export default function DocsPage() {
                       {copiedIndex === idx ? "Copied" : "Copy"}
                     </button>
                   </div>
-                  <div className="p-6 bg-slate-950/95 dark:bg-slate-950 overflow-x-auto rounded-2xl border border-slate-800/90 transition-colors duration-300">
+                  <div className="p-6 bg-slate-950/95 dark:bg-slate-950 overflow-x-auto transition-colors duration-300">
                     <pre className="text-[13px] font-mono text-slate-200 leading-relaxed">
                       <code>{step.code}</code>
                     </pre>
@@ -449,7 +453,7 @@ export default function DocsPage() {
 
           <div
             id="next-steps"
-            className="mt-16 p-8 bg-muted rounded-2xl border border-border shadow-sm relative overflow-hidden scroll-mt-20 transition-colors duration-300"
+            className="mt-16 p-8 bg-gradient-to-br from-muted/50 to-background rounded-2xl border border-border shadow-sm relative overflow-hidden scroll-mt-20 transition-colors duration-300"
           >
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
               <Zap className="w-32 h-32" />
@@ -551,11 +555,7 @@ export default function DocsPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-300">
       <header className="bg-background border-b border-border px-6 h-16 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
         <div className="flex items-center gap-4">
-
-          <button
-            className="lg:hidden text-foreground"
-            onClick={() => setMobileSidebarOpen(true)}
-          >
+          <button className="lg:hidden text-foreground" onClick={() => setMobileSidebarOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
           <Link
@@ -609,8 +609,9 @@ export default function DocsPage() {
 
       <div className="flex-1 flex max-w-[1400px] mx-auto w-full">
         <aside
-          className={`fixed top-0 left-0 h-full w-72 bg-background border-r border-border z-50 transform transition-transform duration-300 lg:hidden ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+          className={`fixed top-0 left-0 h-full w-72 bg-background border-r border-border z-50 transform transition-transform duration-300 lg:hidden ${
+            mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="font-semibold text-foreground">Documentation</h2>

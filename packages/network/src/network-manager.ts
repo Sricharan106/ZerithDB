@@ -45,7 +45,6 @@ export type MediaStreamMetadataInput = Partial<
   >
 > & { kind?: MediaStreamKind };
 
-
 interface SignalingMessage {
   type: "offer" | "answer" | "ice-candidate" | "peer-list";
   from: string;
@@ -110,7 +109,6 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
   get peerId(): PeerId {
     return this.localPeerId;
   }
-
 
   /** The transport type currently in use, or null if not connected */
   get transportType(): "websocket" | "polling" | null {
@@ -273,7 +271,6 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     }
     this.activeTransportType = null;
   }
-
 
   // ─── Private — Transport setup ────────────────────────────────────────────
 
@@ -526,7 +523,6 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     this.peers.set(remotePeerId, peer);
   }
 
-
   addMediaStream(
     stream: MediaStream,
     metadata: MediaStreamMetadataInput = {}
@@ -727,5 +723,4 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
       void this.connect(roomId);
     }, backoff + jitter);
   }
-
 }

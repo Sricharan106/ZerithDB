@@ -6,10 +6,6 @@ export const metadata: Metadata = {
     "Deep dives into CRDTs, peer-to-peer architecture, and offline-first application tutorials.",
 };
 
-export default function BlogLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function BlogLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

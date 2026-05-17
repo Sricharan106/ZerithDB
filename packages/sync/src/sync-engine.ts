@@ -45,7 +45,6 @@ export class SyncEngine extends EventEmitter<SyncEvents> {
     this.ephemeral = new EphemeralStateManager(config, network);
     this.outbox = new OutboxQueue(config.appId);
     this.inbox = new InboxQueue(config.appId);
-    this.ephemeral = new EphemeralStateManager(config, network);
     this.onPeerUpdate = this.onPeerUpdate.bind(this);
     this.onPeerConnected = this.onPeerConnected.bind(this);
     this.onPeerDisconnected = this.onPeerDisconnected.bind(this);

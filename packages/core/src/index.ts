@@ -31,12 +31,21 @@ export type {
   MediaStreamMetadata,
 } from "./types/network.js";
 export type { Identity, PublicKey, Signature } from "./types/auth.js";
+
 export type {
   SyncUpdate,
   SyncState,
   AwarenessState,
-  EphemeralPeerState,
   SyncPlugin,
+  EphemeralPeerState,
   ActiveSpeakerState,
   VideoParticipantState,
 } from "./types/sync.js";
+
+export type {
+  GraphNode,
+  GraphEdge,
+  GraphNodeId,
+  EdgeLabel,
+  GraphTraversalResult,
+} from "./types/graph.js";

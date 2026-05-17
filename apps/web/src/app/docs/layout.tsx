@@ -6,10 +6,6 @@ export const metadata: Metadata = {
     "Get up and running with ZerithDB in under 2 minutes. Local-first, zero-backend setup guide.",
 };
 
-export default function DocsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

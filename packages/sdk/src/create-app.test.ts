@@ -7,7 +7,7 @@ describe("createApp", () => {
 
   afterAll(async () => {
     // Ensure all apps are disposed to avoid leaking async tasks or IndexedDB handles
-    await Promise.all(apps.map(app => app.dispose().catch(() => {})));
+    await Promise.all(apps.map((app) => app.dispose().catch(() => {})));
   });
 
   it("should create a ZerithDBApp instance with valid config", () => {
@@ -29,14 +29,14 @@ describe("createApp", () => {
   it("should have default config values if not provided", () => {
     const app = createApp({ appId: "test-defaults" });
     apps.push(app);
-    
+
     expect(app.config.logLevel).toBe("warn");
     expect(app.config.sync?.signalingUrl).toBe("wss://signal.zerithdb.dev");
     expect(app.config.network?.autoReconnect).toBe(true);
   });
 
   it("should throw an error if appId is missing", () => {
-    // @ts-expect-error - testing invalid config
+    // @ts-ignore - testing invalid config
     expect(() => createApp({})).toThrow('createApp requires a non-empty "appId" in config');
   });
 
