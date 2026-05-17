@@ -371,6 +371,11 @@ export class DbClient {
 
   private readonly collections = new Map<string, CollectionClient<any>>();
 
+  private readonly undoHistory: BackupSnapshot[] = [];
+  private readonly redoHistory: BackupSnapshot[] = [];
+
+  private readonly MAX_HISTORY = 20;
+
   constructor(config: ZerithDBConfig) {
     if (!config?.appId || typeof config.appId !== "string") {
       throw new ZerithDBError(ErrorCode.DB_INIT_FAILED, "Invalid appId provided");
@@ -449,5 +454,63 @@ export class DbClient {
 
   async dispose(): Promise<void> {
     this.dexie.close();
+  }
+
+  async saveUndoSnapshot(): Promise<void> {
+    const snapshot = await this.exportSnapshot();
+
+    this.undoHistory.push(snapshot);
+
+    if (this.undoHistory.length > this.MAX_HISTORY) {
+      this.undoHistory.shift();
+    }
+
+    // new mutation invalidates redo chain
+    this.redoHistory.length = 0;
+  }
+
+  private async restoreSnapshot(snapshot: BackupSnapshot): Promise<void> {
+    for (const name of this.allCollectionNames()) {
+      const table = this.dexie.ensureCollection(name);
+      await table.clear();
+    }
+
+    for (const [collectionName, docs] of Object.entries(snapshot.collections)) {
+      const table = this.dexie.ensureCollection(collectionName);
+
+      if (docs.length > 0) {
+        await table.bulkPut(docs);
+      }
+    }
+  }
+
+  async undo(): Promise<void> {
+    const snapshot = this.undoHistory.pop();
+
+    if (!snapshot) {
+      throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "No operation to undo");
+    }
+
+    // save CURRENT state for redo
+    const currentSnapshot = await this.exportSnapshot();
+
+    this.redoHistory.push(currentSnapshot);
+
+    await this.restoreSnapshot(snapshot);
+  }
+
+  async redo(): Promise<void> {
+    const snapshot = this.redoHistory.pop();
+
+    if (!snapshot) {
+      throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "No operation to redo");
+    }
+
+    // save current state for undo
+    const currentSnapshot = await this.exportSnapshot();
+
+    this.undoHistory.push(currentSnapshot);
+
+    await this.restoreSnapshot(snapshot);
   }
 }
