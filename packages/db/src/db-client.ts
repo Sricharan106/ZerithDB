@@ -343,20 +343,25 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   }
 
   private matchesFilter(doc: Document<T>, filter: QueryFilter<T>): boolean {
-    const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin"];
+    const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex"];
 
     for (const [key, condition] of Object.entries(filter)) {
       const fieldValue = (doc as Record<string, any>)[key];
 
-      if (condition === null || typeof condition !== "object") {
-        if (fieldValue !== condition) return false;
+      // Primitive equality matching
+      // Example:
+      // { age: 10 }
+      if (condition === null || typeof condition !== "object" || condition instanceof RegExp) {
+        if (fieldValue !== condition) {
+          return false;
+        }
+
         continue;
       }
 
-      // Distinguish operator objects ({ $gt: 3 }) from plain object values ({ key: "v" }).
-      // Only treat as operators if at least one key starts with "$".
       const conditions = condition as Record<string, any>;
 
+      // Validate supported operators
       for (const op of Object.keys(conditions)) {
         if (op.startsWith("$") && !validOperators.includes(op)) {
           throw new ZerithDBError(ErrorCode.DB_READ_FAILED, `Unsupported query operator: ${op}`);
@@ -365,6 +370,9 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
       const isOperatorObject = Object.keys(conditions).some((k) => k.startsWith("$"));
 
+      // Deep object equality
+      // Example:
+      // { profile: { name: "john" } }
       if (!isOperatorObject) {
         if (JSON.stringify(fieldValue) !== JSON.stringify(condition)) {
           return false;
@@ -373,13 +381,33 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         continue;
       }
 
-      if ("$eq" in conditions && fieldValue !== conditions.$eq) return false;
-      if ("$ne" in conditions && fieldValue === conditions.$ne) return false;
-      if ("$gt" in conditions && !(fieldValue > conditions.$gt)) return false;
-      if ("$gte" in conditions && !(fieldValue >= conditions.$gte)) return false;
-      if ("$lt" in conditions && !(fieldValue < conditions.$lt)) return false;
-      if ("$lte" in conditions && !(fieldValue <= conditions.$lte)) return false;
+      // Equality operators
+      if ("$eq" in conditions && fieldValue !== conditions.$eq) {
+        return false;
+      }
 
+      if ("$ne" in conditions && fieldValue === conditions.$ne) {
+        return false;
+      }
+
+      // Comparison operators
+      if ("$gt" in conditions && !(fieldValue > conditions.$gt)) {
+        return false;
+      }
+
+      if ("$gte" in conditions && !(fieldValue >= conditions.$gte)) {
+        return false;
+      }
+
+      if ("$lt" in conditions && !(fieldValue < conditions.$lt)) {
+        return false;
+      }
+
+      if ("$lte" in conditions && !(fieldValue <= conditions.$lte)) {
+        return false;
+      }
+
+      // Array inclusion operators
       if ("$in" in conditions && !(conditions.$in as unknown[]).includes(fieldValue)) {
         return false;
       }
@@ -409,6 +437,28 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
           return false;
         }
       }
+
+      // Regular expression matching
+      // Handle regex-based matching
+      if ("$regex" in conditions) {
+        const regex =
+          conditions.$regex instanceof RegExp
+            ? new RegExp(
+                conditions.$regex.source,
+                conditions.$regex.flags.replace("g", "").replace("y", "")
+              )
+            : new RegExp(conditions.$regex);
+
+        // Regex only works on strings
+        if (typeof fieldValue !== "string") {
+          return false;
+        }
+
+        // Exclude document if regex does not match
+        if (!regex.test(fieldValue)) {
+          return false;
+        }
+      }
     }
 
     return true;
@@ -422,7 +472,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         const isOperatorObject = Object.keys(conditions).some((k) => k.startsWith("$"));
         if (isOperatorObject && "$regex" in conditions) {
           const regex = conditions["$regex"];
-          conditions["$regex"] = regex instanceof RegExp ? regex : new RegExp(regex);
+          // Precompile regex and remove stateful flags
+          conditions["$regex"] =
+            regex instanceof RegExp
+              ? new RegExp(regex.source, regex.flags.replace("g", "").replace("y", ""))
+              : new RegExp(regex);
         }
         compiled[key] = conditions;
       } else {
