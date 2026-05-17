@@ -35,9 +35,8 @@ export type {
   SyncUpdate,
   SyncState,
   AwarenessState,
-  SyncPlugin,
   EphemeralPeerState,
+  SyncPlugin,
   ActiveSpeakerState,
   VideoParticipantState,
 } from "./types/sync.js";
-

@@ -25,7 +25,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=!./apps/* && changeset publish",
-    "prepare": "husky",
+    "prepare": "husky && sh scripts/setup-git-config.sh",
     "build:audit": "pnpm --filter zerithdb-audit build",
     "benchmark": "tsx scripts/benchmark.ts"
   },

@@ -91,6 +91,9 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   async insert(document: T): Promise<InsertResult> {
     this.validateDocument(document);
 
+    if (document === null || document === undefined) {
+      throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document cannot be null or undefined");
+    }
     const now = Date.now();
     const id = uuidv7();
 
@@ -151,7 +154,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       `Failed to query collection "${this.collectionName}"`,
       async () => {
         const all = await this.table.toArray();
-        return all.filter((doc) => this.matchesFilter(doc, filter));
+        const compiledFilter = this.precompileRegexes(filter);
+        return all.filter((doc) => this.matchesFilter(doc, compiledFilter));
       }
     );
   }
@@ -256,7 +260,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
     next._id = doc._id;
     next._createdAt = doc._createdAt;
-    next._updatedAt = updatedAt;
 
     return next as Document<T>;
   }
@@ -307,6 +310,24 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     }
 
     return true;
+  }
+
+  private precompileRegexes(filter: QueryFilter<T>): QueryFilter<T> {
+    const compiled: Record<string, any> = {};
+    for (const [key, condition] of Object.entries(filter)) {
+      if (condition !== null && typeof condition === "object") {
+        const conditions = { ...condition } as Record<string, any>;
+        const isOperatorObject = Object.keys(conditions).some((k) => k.startsWith("$"));
+        if (isOperatorObject && "$regex" in conditions) {
+          const regex = conditions["$regex"];
+          conditions["$regex"] = regex instanceof RegExp ? regex : new RegExp(regex);
+        }
+        compiled[key] = conditions;
+      } else {
+        compiled[key] = condition;
+      }
+    }
+    return compiled as QueryFilter<T>;
   }
 }
 

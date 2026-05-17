@@ -4,7 +4,7 @@ import { DbClient } from "../../packages/db/src/db-client.js";
 import type { ZerithDBConfig } from "../../packages/core/src/index.js";
 import { ZerithDBError, ErrorCode } from "../../packages/core/src/index.js";
 
-describe("DbClient — CollectionClient (Main interface for collection operations)", () => {
+describe("DbClient — CollectionClient", () => {
   let db: DbClient;
   let currentAppId: string;
 
