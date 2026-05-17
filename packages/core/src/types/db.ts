@@ -29,7 +29,8 @@ export type QueryFilter<T extends Record<string, any>> = {
     | { $in: Document<T>[K][] }
     | { $nin: Document<T>[K][] }
     | { $exists: boolean }
-    | { $regex: RegExp | string };
+    | { $regex: RegExp | string }
+    | { $exists: boolean };
 };
 
 /** Partial update spec — only specified fields are modified */
