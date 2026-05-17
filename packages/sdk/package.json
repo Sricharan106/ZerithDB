@@ -1,6 +1,6 @@
 {
   "name": "zerithdb-sdk",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "ZerithDB SDK — build full-stack apps with zero backend",
   "keywords": [
     "local-first",
