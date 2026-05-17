@@ -21,7 +21,8 @@ const RESERVED_FIELDS = ["_id", "_createdAt", "_updatedAt"];
 export class CollectionClient<T extends Record<string, any> = Record<string, any>> {
   constructor(
     private readonly table: Table<Document<T>>,
-    private readonly collectionName: string
+    private readonly collectionName: string,
+    private readonly db: DbClient
   ) {}
 
   /**
@@ -76,6 +77,12 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     }
   }
 
+  /**
+   * Upsert:
+   * - inserts if doc doesn't exist
+   * - updates if doc already exists
+   */
+
   async upsert(document: Partial<T> & { _id?: string }): Promise<InsertResult> {
     if (document === null || document === undefined) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document cannot be null or undefined");
@@ -84,6 +91,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     if (typeof document !== "object" || Array.isArray(document)) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document must be a valid object");
     }
+
+    await this.db.saveUndoSnapshot();
 
     const now = Date.now();
     const id = document._id ?? uuidv7();
@@ -115,6 +124,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
   async insert(document: T): Promise<InsertResult> {
     this.validateDocument(document);
+
+    await this.db.saveUndoSnapshot();
 
     if (document === null || document === undefined) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document cannot be null or undefined");
@@ -155,6 +166,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     for (const doc of documents) {
       this.validateDocument(doc);
     }
+
+    await this.db.saveUndoSnapshot();
 
     const now = Date.now();
 
@@ -240,6 +253,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Update spec must contain $set or $unset");
     }
 
+    await this.db.saveUndoSnapshot();
+
     return wrapIDBOperation(
       ErrorCode.DB_WRITE_FAILED,
       `Failed to update documents in "${this.collectionName}"`,
@@ -267,6 +282,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   async delete(filter: QueryFilter<T>): Promise<number> {
     this.validateFilter(filter);
 
+    await this.db.saveUndoSnapshot();
+
     return wrapIDBOperation(
       ErrorCode.DB_DELETE_FAILED,
       `Failed to delete documents from "${this.collectionName}"`,
@@ -289,6 +306,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    */
 
   async clearAll(): Promise<void> {
+    await this.db.saveUndoSnapshot();
+
     return wrapIDBOperation(
       ErrorCode.DB_DELETE_FAILED,
       `Failed to clear collection "${this.collectionName}"`,
@@ -327,20 +346,25 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   }
 
   private matchesFilter(doc: Document<T>, filter: QueryFilter<T>): boolean {
-    const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin"];
+    const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex"];
 
     for (const [key, condition] of Object.entries(filter)) {
       const fieldValue = (doc as Record<string, any>)[key];
 
-      if (condition === null || typeof condition !== "object") {
-        if (fieldValue !== condition) return false;
+      // Primitive equality matching
+      // Example:
+      // { age: 10 }
+      if (condition === null || typeof condition !== "object" || condition instanceof RegExp) {
+        if (fieldValue !== condition) {
+          return false;
+        }
+
         continue;
       }
 
-      // Distinguish operator objects ({ $gt: 3 }) from plain object values ({ key: "v" }).
-      // Only treat as operators if at least one key starts with "$".
       const conditions = condition as Record<string, any>;
 
+      // Validate supported operators
       for (const op of Object.keys(conditions)) {
         if (op.startsWith("$") && !validOperators.includes(op)) {
           throw new ZerithDBError(ErrorCode.DB_READ_FAILED, `Unsupported query operator: ${op}`);
@@ -349,6 +373,9 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
       const isOperatorObject = Object.keys(conditions).some((k) => k.startsWith("$"));
 
+      // Deep object equality
+      // Example:
+      // { profile: { name: "john" } }
       if (!isOperatorObject) {
         if (JSON.stringify(fieldValue) !== JSON.stringify(condition)) {
           return false;
@@ -357,19 +384,59 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         continue;
       }
 
-      if ("$eq" in conditions && fieldValue !== conditions.$eq) return false;
-      if ("$ne" in conditions && fieldValue === conditions.$ne) return false;
-      if ("$gt" in conditions && !(fieldValue > conditions.$gt)) return false;
-      if ("$gte" in conditions && !(fieldValue >= conditions.$gte)) return false;
-      if ("$lt" in conditions && !(fieldValue < conditions.$lt)) return false;
-      if ("$lte" in conditions && !(fieldValue <= conditions.$lte)) return false;
+      // Equality operators
+      if ("$eq" in conditions && fieldValue !== conditions.$eq) {
+        return false;
+      }
 
+      if ("$ne" in conditions && fieldValue === conditions.$ne) {
+        return false;
+      }
+
+      // Comparison operators
+      if ("$gt" in conditions && !(fieldValue > conditions.$gt)) {
+        return false;
+      }
+
+      if ("$gte" in conditions && !(fieldValue >= conditions.$gte)) {
+        return false;
+      }
+
+      if ("$lt" in conditions && !(fieldValue < conditions.$lt)) {
+        return false;
+      }
+
+      if ("$lte" in conditions && !(fieldValue <= conditions.$lte)) {
+        return false;
+      }
+
+      // Array inclusion operators
       if ("$in" in conditions && !(conditions.$in as unknown[]).includes(fieldValue)) {
         return false;
       }
 
       if ("$nin" in conditions && (conditions.$nin as unknown[]).includes(fieldValue)) {
         return false;
+      }
+
+      // Regular expression matching
+      if ("$regex" in conditions) {
+        const regex =
+          conditions.$regex instanceof RegExp
+            ? conditions.$regex
+            : new RegExp(String(conditions.$regex));
+
+        // Regex only works on strings
+        if (typeof fieldValue !== "string") {
+          return false;
+        }
+
+        // Reset stateful regex flags (/g, /y)
+        regex.lastIndex = 0;
+
+        if (!regex.test(fieldValue)) {
+          return false;
+        }
       }
     }
 
@@ -476,7 +543,7 @@ export class DbClient {
     if (!this.collections.has(name)) {
       const table = this.dexie.ensureCollection(name);
 
-      this.collections.set(name, new CollectionClient<T>(table as Table<Document<T>>, name));
+      this.collections.set(name, new CollectionClient<T>(table as Table<Document<T>>, name, this));
     }
 
     return this.collections.get(name) as CollectionClient<T>;
@@ -516,6 +583,7 @@ export class DbClient {
   /**
    * Export all collections to a JSON-serializable snapshot.
    * If options.collections is omitted, it exports ALL collections found in IndexedDB.
+   * undo and redo stack Stores snapshots BEFORE/AFTER mutations.
    */
   async exportSnapshot(options: BackupExportOptions = {}): Promise<BackupSnapshot> {
     return wrapIDBOperation(
