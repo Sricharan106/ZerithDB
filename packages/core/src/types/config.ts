@@ -1,3 +1,5 @@
+import type { EphemeralConfig } from "./sync.js";
+
 export interface SyncConfig {
   /**
    * WebSocket URL of the ZerithDB signaling server.
@@ -24,26 +26,39 @@ export interface SyncConfig {
    * @default 10
    */
   maxPeers?: number;
+/**
+ * Delay between sync broadcasts in ms.
+ * Helps batch rapid Yjs updates together.
+ * @default 100
+ */
+updateThrottleMs?: number;
+
+/**
+ * Signaling transport preference.
+ * - `"auto"`      — Try WebSocket first, fall back to HTTP long-polling (default)
+ * - `"websocket"` — WebSocket only (original behavior)
+ * - `"polling"`   — HTTP long-polling only (for strict firewall environments)
+ * @default "auto"
+ */
+transport?: "auto" | "websocket" | "polling";
 
   /**
-   * Signaling transport preference.
-   * - `"auto"`      — Try WebSocket first, fall back to HTTP long-polling (default)
-   * - `"websocket"` — WebSocket only (original behavior)
-   * - `"polling"`   — HTTP long-polling only (for strict firewall environments)
-   * @default "auto"
+   * Configuration for the {@link EphemeralStateManager}.
+   * Controls broadcast throttling and stale-peer cleanup timing.
    */
   transport?: "auto" | "websocket" | "polling";
 
   /**
-   * Configuration options for low-latency ephemeral sync state.
+   * Configuration options for the ephemeral (non-persistent) state sync channel.
    */
-  ephemeral?: EphemeralConfig;
-}
-
-export interface EphemeralConfig {
-  cleanupIntervalMs?: number;
-  throttleMs?: number;
-  staleAfterMs?: number;
+  ephemeral?: {
+    /** Interval in ms for cleaning up stale peer states. @default 5000 */
+    cleanupIntervalMs?: number;
+    /** Time in ms before a peer's state is considered stale. @default 30000 */
+    staleAfterMs?: number;
+    /** Minimum ms between outgoing broadcasts (throttle). @default 0 */
+    throttleMs?: number;
+  };
 }
 
 export interface AuthConfig {
@@ -52,6 +67,12 @@ export interface AuthConfig {
    * @default "__zerithdb_identity"
    */
   storageKey?: string;
+
+  /**
+   * URL of the shared wallet iframe for cross-origin identity management.
+   * Required when using WalletProxy instead of local AuthManager.
+   */
+  walletUrl?: string;
 }
 
 export interface DebugConfig {
@@ -65,6 +86,16 @@ export interface DebugConfig {
 
 export interface NetworkConfig {
   /**
+   * Human-readable alias for this peer in the mesh.
+   */
+  name?: string;
+
+  /**
+   * Optional ENS identity to attach to this peer.
+   */
+  ens?: string;
+
+  /**
    * Whether to automatically reconnect when a peer disconnects.
    * @default true
    */
@@ -75,11 +106,20 @@ export interface NetworkConfig {
    * @default 1000
    */
   reconnectDelay?: number;
-  /** Optional human-readable peer alias */
-  name?: string;
+}
 
-  /** Optional ENS identity */
-  ens?: string;
+export interface DbConfig {
+  /**
+   * IPFS RPC URL for uploading blobs.
+   * @default "https://ipfs.infura.io:5001/api/v0"
+   */
+  ipfsRpcUrl?: string;
+
+  /**
+   * IPFS Gateway URL for downloading blobs.
+   * @default "https://ipfs.io/ipfs/"
+   */
+  ipfsGatewayUrl?: string;
 }
 
 export interface ZerithDBConfig {
@@ -90,10 +130,12 @@ export interface ZerithDBConfig {
    */
   appId: string;
 
+  db?: DbConfig;
   sync?: SyncConfig;
   auth?: AuthConfig;
   network?: NetworkConfig;
   debug?: DebugConfig;
+  conflictResolver?: ConflictResolverConfig;
 
   /**
    * Log level for internal ZerithDB diagnostics.
@@ -101,3 +143,4 @@ export interface ZerithDBConfig {
    */
   logLevel?: "debug" | "info" | "warn" | "error" | "silent";
 }
+

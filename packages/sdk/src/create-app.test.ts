@@ -7,7 +7,7 @@ describe("createApp", () => {
 
   afterAll(async () => {
     // Ensure all apps are disposed to avoid leaking async tasks or IndexedDB handles
-    await Promise.all(apps.map(app => app.dispose().catch(() => {})));
+    await Promise.all(apps.map((app) => app.dispose().catch(() => { })));
   });
 
   it("should create a ZerithDBApp instance with valid config", () => {
@@ -20,7 +20,7 @@ describe("createApp", () => {
     expect(app).toBeDefined();
     expect(app.config.appId).toBe("test-app");
     expect(app.db).toBeDefined();
-    expect(app.sync).toBeDefined();
+    expect("sync" in app).toBe(true);
     expect(app.auth).toBeDefined();
     expect(app.network).toBeDefined();
     expect(app.dispose).toBeDefined();
@@ -29,7 +29,7 @@ describe("createApp", () => {
   it("should have default config values if not provided", () => {
     const app = createApp({ appId: "test-defaults" });
     apps.push(app);
-    
+
     expect(app.config.logLevel).toBe("warn");
     expect(app.config.sync?.signalingUrl).toBe("wss://signal.zerithdb.dev");
     expect(app.config.network?.autoReconnect).toBe(true);

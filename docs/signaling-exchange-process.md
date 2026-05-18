@@ -60,11 +60,12 @@ The WebSocket connection includes:
 
 - `room` → identifies the room being joined
 - `peer` → uniquely identifies the local peer
+- `powChallenge` and `powNonce` → Hashcash proof-of-work solution for the initial join
 
 Example:
 
 ```text
-wss://signal-server-url?room=my-room&peer=peer-id
+wss://signal-server-url?room=my-room&peer=peer-id&powChallenge=...&powNonce=...
 ```
 
 At this stage, the connection is only used for signaling and peer discovery. Application data is not
@@ -88,9 +89,7 @@ For every discovered peer, ZerithDB creates a peer connection:
 this.createPeer(peerId, true);
 ```
 
-The `true` value marks the peer as the **initiator**, meaning it starts the WebRTC handshake.
-
----
+## The `true` value marks the peer as the **initiator**, meaning it starts the WebRTC handshake.
 
 ## 3. Offer and Answer Exchange
 
@@ -148,9 +147,7 @@ The answer is handled using:
 case "answer":
 ```
 
-and applied to complete the connection setup.
-
----
+## and applied to complete the connection setup.
 
 ## 4. ICE Candidate Exchange
 

@@ -122,4 +122,92 @@ describe("CollectionClient — $regex operator", () => {
     // Our resetting of lastIndex = 0 ensures all matches are correctly verified!
     expect(results).toHaveLength(3);
   });
+
+  it("supports $exists true queries", async () => {
+    const users = db.collection("users");
+
+    await users.insert({
+      name: "Zerith",
+      email: "zerith@example.com",
+    });
+
+    await users.insert({
+      name: "Anonymous",
+    });
+
+    const result = await users.find({
+      email: { $exists: true },
+    });
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("supports $exists false queries", async () => {
+    const users = db.collection("users");
+
+    await users.insert({
+      name: "Zerith",
+      email: "zerith@example.com",
+    });
+
+    await users.insert({
+      name: "Anonymous",
+    });
+
+    const result = await users.find({
+      email: { $exists: false },
+    });
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("supports $regex string queries", async () => {
+    const users = db.collection("users");
+
+    await users.insert({
+      name: "ZerithDB",
+    });
+
+    await users.insert({
+      name: "MongoDB",
+    });
+
+    const result = await users.find({
+      name: { $regex: "^Zerith" },
+    });
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("supports RegExp object queries", async () => {
+    const users = db.collection("users");
+
+    await users.insert({
+      name: "ZerithDB",
+    });
+
+    await users.insert({
+      name: "MongoDB",
+    });
+
+    const result = await users.find({
+      name: { $regex: /zerith/i },
+    });
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("returns no matches for regex on non-string fields", async () => {
+    const users = db.collection("users");
+
+    await users.insert({
+      age: 25,
+    });
+
+    const result = await users.find({
+      age: { $regex: "25" as never },
+    });
+
+    expect(result).toHaveLength(0);
+  });
 });

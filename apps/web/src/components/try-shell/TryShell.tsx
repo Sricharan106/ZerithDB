@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -6,18 +7,18 @@ import { EXAMPLES } from "./examples";
 import { Code2, Sparkles, ChevronRight } from "lucide-react";
 
 // Lazy load the editor to keep initial bundle size small
-const CodeEditor = dynamic(() => import("./Editor"), {
+const CodeEditor = dynamic(() => import("./Editor") as any, {
   ssr: false,
   loading: () => (
     <div className="h-[400px] w-full bg-gray-900 rounded-lg animate-pulse flex items-center justify-center">
       <span className="text-gray-500 font-mono">Loading Editor...</span>
     </div>
   ),
-});
+}) as any;
 
-const Preview = dynamic(() => import("./Preview"), {
+const Preview = dynamic(() => import("./Preview") as any, {
   ssr: false,
-});
+}) as any;
 
 export const TryShell: React.FC = () => {
   const [activeExample, setActiveExample] = useState(EXAMPLES[0]);
@@ -79,7 +80,7 @@ export const TryShell: React.FC = () => {
             </div>
           </div>
           <div className="flex-1">
-            <CodeEditor code={code} onChange={(val) => setCode(val || "")} />
+            <CodeEditor code={code} onChange={(val: any) => setCode(val || "")} />
           </div>
         </div>
 

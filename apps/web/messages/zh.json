@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "docs": "文档",
+    "playground": "游乐场",
+    "github": "GitHub"
+  },
+  "header": {
+    "tagline": "构建无后端应用",
+    "title": "ZerithDB",
+    "subtitle": "本地优先、点对点、CRDT 驱动的浏览器原生数据库平台"
+  },
+  "hero": {
+    "title": "浏览器就是服务器",
+    "description": "本地优先、点对点、CRDT 驱动的数据库。构建零后端基础设施的全栈应用。",
+    "cta": "开始使用",
+    "explore": "浏览文档"
+  },
+  "features": {
+    "localFirst": {
+      "title": "本地优先",
+      "description": "数据存储在您的浏览器中。离线工作。在线时同步。"
+    },
+    "peerToPeer": {
+      "title": "点对点",
+      "description": "无需服务器的直接设备到设备同步。"
+    },
+    "crdt": {
+      "title": "CRDT 驱动",
+      "description": "无冲突复制数据类型，实现自动合并。"
+    },
+    "sync": {
+      "title": "实时同步",
+      "description": "变化在所有连接的对等端间瞬间传播。"
+    },
+    "secure": {
+      "title": "端到端加密",
+      "description": "内置的传输和静止数据加密。"
+    },
+    "performance": {
+      "title": "闪电般快速",
+      "description": "本地优先架构实现毫秒级响应时间。"
+    }
+  },
+  "docs": {
+    "title": "文档",
+    "gettingStarted": "入门指南",
+    "installation": "安装",
+    "quickStart": "快速开始",
+    "api": "API 参考",
+    "guides": "指南",
+    "examples": "示例"
+  },
+  "footer": {
+    "copyright": "© 2024 ZerithDB。保留所有权利。",
+    "legal": "法律声明",
+    "privacy": "隐私政策",
+    "terms": "服务条款"
+  },
+  "common": {
+    "learn": "了解更多",
+    "backHome": "返回主页",
+    "save": "保存",
+    "tryNow": "立即尝试",
+    "viewCode": "查看代码",
+    "documentation": "文档",
+    "language": "语言"
+  }
+}

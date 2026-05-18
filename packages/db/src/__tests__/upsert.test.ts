@@ -68,4 +68,71 @@ describe("upsert", () => {
     expect(after?._createdAt).toBe(before?._createdAt);
     expect(after?._updatedAt).toBeGreaterThanOrEqual(before!._updatedAt);
   });
+  it("generates a new _id when _id is null", async () => {
+    const db = new DbClient({
+      appId: "upsert-null-id-test",
+    });
+
+    const users = db.collection<{ name: string }>("users");
+
+    const result = await users.upsert({
+      _id: null as any,
+      name: "John",
+    });
+
+    const doc = await users.findById(result.id);
+
+    expect(result.id).toBeDefined();
+    expect(doc).toBeDefined();
+    expect(doc?.name).toBe("John");
+  });
+
+  it("generates a new _id when _id is undefined", async () => {
+    const db = new DbClient({
+      appId: "upsert-undefined-id-test",
+    });
+
+    const users = db.collection<{ name: string }>("users");
+
+    const result = await users.upsert({
+      _id: undefined,
+      name: "Jane",
+    });
+
+    const doc = await users.findById(result.id);
+
+    expect(result.id).toBeDefined();
+    expect(doc).toBeDefined();
+    expect(doc?.name).toBe("Jane");
+  });
+
+  it("throws when upserting null", async () => {
+    const db = new DbClient({
+      appId: "upsert-null-doc-test",
+    });
+
+    const users = db.collection<{ name: string }>("users");
+
+    await expect(users.upsert(null as any)).rejects.toThrow("Document cannot be null or undefined");
+  });
+
+  it("throws when upserting a non-object value", async () => {
+    const db = new DbClient({
+      appId: "upsert-invalid-doc-test",
+    });
+
+    const users = db.collection<{ name: string }>("users");
+
+    await expect(users.upsert("invalid" as any)).rejects.toThrow("Document must be a valid object");
+  });
+
+  it("throws when upserting an array", async () => {
+    const db = new DbClient({
+      appId: "upsert-array-doc-test",
+    });
+
+    const users = db.collection<{ name: string }>("users");
+
+    await expect(users.upsert([] as any)).rejects.toThrow("Document must be a valid object");
+  });
 });

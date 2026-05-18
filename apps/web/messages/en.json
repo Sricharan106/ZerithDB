@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "docs": "Documentation",
+    "playground": "Playground",
+    "github": "GitHub"
+  },
+  "header": {
+    "tagline": "Build apps with zero backend",
+    "title": "ZerithDB",
+    "subtitle": "Local-first, peer-to-peer, CRDT-powered browser-native database platform"
+  },
+  "hero": {
+    "title": "The browser is the server",
+    "description": "Local-first, peer-to-peer, CRDT-powered database. Build full-stack apps with ZERO backend infrastructure.",
+    "cta": "Get Started",
+    "explore": "Explore Docs"
+  },
+  "features": {
+    "localFirst": {
+      "title": "Local-First",
+      "description": "Data lives in your browser. Works offline. Syncs when online."
+    },
+    "peerToPeer": {
+      "title": "Peer-to-Peer",
+      "description": "Direct device-to-device synchronization without servers."
+    },
+    "crdt": {
+      "title": "CRDT-Powered",
+      "description": "Conflict-free replicated data types for automatic merging."
+    },
+    "sync": {
+      "title": "Real-time Sync",
+      "description": "Changes propagate instantly across all connected peers."
+    },
+    "secure": {
+      "title": "End-to-End Encryption",
+      "description": "Built-in encryption for all data in transit and at rest."
+    },
+    "performance": {
+      "title": "Lightning Fast",
+      "description": "Millisecond response times with local-first architecture."
+    }
+  },
+  "docs": {
+    "title": "Documentation",
+    "gettingStarted": "Getting Started",
+    "installation": "Installation",
+    "quickStart": "Quick Start",
+    "api": "API Reference",
+    "guides": "Guides",
+    "examples": "Examples"
+  },
+  "footer": {
+    "copyright": "© 2024 ZerithDB. All rights reserved.",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms of Service"
+  },
+  "common": {
+    "learn": "Learn More",
+    "backHome": "Back to Home",
+    "save": "Save",
+    "tryNow": "Try Now",
+    "viewCode": "View Code",
+    "documentation": "Documentation",
+    "language": "Language"
+  }
+}

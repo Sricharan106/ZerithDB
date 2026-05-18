@@ -24,6 +24,7 @@
 - [Phase 4 — Ecosystem & v10](#phase-4--ecosystem--v10-v10)
 - [Future / Research](#future--research)
 - [How to Influence the Roadmap](#how-to-influence-the-roadmap)
+
 ---
 
 ## Phase 0 — Foundation (v0.1) — **Current**
@@ -37,7 +38,7 @@ The goal of this phase is to establish a working, testable monorepo with core fu
 | `zerithdb-db` — IndexedDB via Dexie        | 🚧     | Basic CRUD done, live queries WIP |
 | `zerithdb-sync` — Yjs integration          | 🚧     | Local sync working, network WIP   |
 | `zerithdb-network` — WebRTC + signaling    | 🚧     | 2-peer tested, mesh topology WIP  |
-| `zerithdb-auth` — Ed25519 keypair identity | 📋     |                                   |
+| `zerithdb-auth` — Ed25519 keypair identity | 🚧     |                                   |
 | `zerithdb-sdk` — createApp() API           | 🚧     | Basic composition working         |
 | `zerithdb-cli` — `zerithdb init`           | 📋     |                                   |
 | Signaling server                           | ✅     | Basic WebSocket relay             |
@@ -156,8 +157,10 @@ Contributors can support ZerithDB development in several areas:
 - Optimizing local database performance
 
 New contributors are encouraged to explore issues labeled:
+
 - `good-first-issue`
 - `help-wanted`
+
 ---
 
 ## How to Influence the Roadmap

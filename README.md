@@ -22,35 +22,35 @@
 
 ZerithDB provides multiple packages for building collaborative and offline-first applications.
 
-| Package | Installation | Description |
-| --- | --- | --- |
-| `zerithdb-sdk` | `npm install zerithdb-sdk` | Main developer-facing SDK |
-| `zerithdb-db` | `npm install zerithdb-db` | IndexedDB adapter |
-| `zerithdb-sync` | `npm install zerithdb-sync` | CRDT sync engine |
-| `zerithdb-network` | `npm install zerithdb-network` | WebRTC networking layer |
-| `zerithdb-auth` | `npm install zerithdb-auth` | Authentication utilities |
-| `zerithdb-core` | `npm install zerithdb-core` | Shared internal utilities |
-| `zerithdb-cli` | `npm install -g zerithdb-cli` | CLI tooling |
-| `zerithdb-react` | `npm install zerithdb-react` | React integration package |
-| `zerithdb-python` | `pip install zerithdb-python` | Python SDK support |
+| Package            | Installation                   | Description               |
+| ------------------ | ------------------------------ | ------------------------- |
+| `zerithdb-sdk`     | `npm install zerithdb-sdk`     | Main developer-facing SDK |
+| `zerithdb-db`      | `npm install zerithdb-db`      | IndexedDB adapter         |
+| `zerithdb-sync`    | `npm install zerithdb-sync`    | CRDT sync engine          |
+| `zerithdb-network` | `npm install zerithdb-network` | WebRTC networking layer   |
+| `zerithdb-auth`    | `npm install zerithdb-auth`    | Authentication utilities  |
+| `zerithdb-core`    | `npm install zerithdb-core`    | Shared internal utilities |
+| `zerithdb-cli`     | `npm install -g zerithdb-cli`  | CLI tooling               |
+| `zerithdb-react`   | `npm install zerithdb-react`   | React integration package |
+| `zerithdb-python`  | `pip install zerithdb-python`  | Python SDK support        |
 
 ---
 
 ## Table of Contents
 
-* [What is ZerithDB?](#what-is-zerithdb)
-* [Why ZerithDB?](#why-zerithdb)
-* [The 30-Second Demo](#the-30-second-demo)
-* [Features](#features)
-* [Quick Start](#quick-start)
-* [Architecture in One Diagram](#architecture-in-one-diagram)
-* [Packages](#packages)
-* [CLI Reference](#cli-reference)
-* [FAQ](#faq)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [Community](#community)
-* [License](#license)
+- [What is ZerithDB?](#what-is-zerithdb)
+- [Why ZerithDB?](#why-zerithdb)
+- [The 30-Second Demo](#the-30-second-demo)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Architecture in One Diagram](#architecture-in-one-diagram)
+- [Packages](#packages)
+- [CLI Reference](#cli-reference)
+- [FAQ](#faq)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Community](#community)
+- [License](#license)
 
 ---
 
@@ -126,25 +126,15 @@ That's it. No `.env` files. No `docker-compose.yml`. No cloud accounts.
 
 ## Quick Start
 
-### Option 1: CLI (Recommended)
+### Installation
 
-If you're new here, follow these beginner friendly steps to get ZerithDB running on your machine:
-
-| Step | Action              | Command                           | What it does                            |
-| ---- | ------------------- | --------------------------------- | --------------------------------------- |
-| 1    | **Initialize**      | `npx zerithdb@latest init my-app` | Creates your project folder.            |
-| 2    | **Go to Directory** | `cd my-app`                       | Enters the folder you just created.     |
-| 3    | **Install**         | `npm install`                     | Gets all the tools needed for the app.  |
-| 4    | **Start App**       | `npm run dev`                     | Launches the app in your local browser. |
-
-> **Note:** You need [Node.js](https://nodejs.org/) installed to run these commands!
-
-### Option 2: Manual Install
+> **Note:** ZerithDB is currently in alpha and packages are not yet published to NPM. To use it, please clone the repository!
 
 ```bash
-pnpm add zerithdb-sdk
-# or
-npm install zerithdb-sdk
+git clone https://github.com/Zerith-Labs/ZerithDB.git
+cd ZerithDB
+pnpm install
+pnpm dev
 ```
 
 ### Minimal Setup
@@ -166,7 +156,8 @@ const app = createApp({
 
 ## Documentation Navigation
 
-New contributors and developers can use the following documents to better understand the project structure and workflow:
+New contributors and developers can use the following documents to better understand the project
+structure and workflow:
 
 - [Architecture Overview](ARCHITECTURE.md)
 - [Roadmap](ROADMAP.md)
@@ -180,6 +171,7 @@ For the best onboarding experience:
 2. Explore the architecture documentation
 3. Review the roadmap for planned features
 4. Read contribution guidelines before contributing
+
 ### Local Cloud Backups
 
 ```typescript
@@ -242,27 +234,26 @@ ZerithDB ephemeral sync, so they are broadcast immediately and never persisted.
 ```mermaid
 flowchart TB
   subgraph browser["Your Browser"]
-    direction LR
-    SDK["ZerithDB SDK"]
-    SYNC["Sync Engine\n(CRDT)"]
-    P2P["P2P Network Layer\n(WebRTC mesh)"]
-    SDK -->|writes| SYNC
-    SYNC -->|broadcast| P2P
+    SDK["zerithdb-sdk\nOrchestrates all packages"]
+    SYNC["zerithdb-sync\nYjs CRDT engine"]
+    NET["zerithdb-network\nWebRTC mesh"]
+    AUTH["zerithdb-auth\nEd25519 signing"]
+    SDK --> SYNC
+    SDK --> NET
+    SDK --> AUTH
+    AUTH -->|signs every delta| SYNC
+    SYNC -->|signed delta| NET
   end
 
   subgraph storage["Local Storage"]
-    DB["Local DB\n(IndexedDB)"]
+    DB["zerithdb-db\nIndexedDB via Dexie"]
   end
 
-  SDK -->|persist| DB
-  SYNC -->|flush| DB
+  SDK --> DB
+  SYNC <-->|delta updates| DB
 
-  SIG["Signaling Server\n(WS relay)"]
-  PEER["Other Peer Browser"]
-
-  P2P -->|handshake only| SIG
-  SIG -->|peer discovery| PEER
-  P2P <-.->|"direct P2P\n(after handshake)"| PEER
+  NET <-.->|ICE handshake only| SIG["Signaling Server\nDumb WebSocket relay\nNo data stored"]
+  NET <-->|Direct P2P after handshake| PEER["Other Peer Browser\nSame zerithdb stack"]
 ```
 
 The signaling server **never sees your data**. It only brokers the initial WebRTC handshake. After
@@ -303,49 +294,24 @@ npx zerithdb types --output ./src/db.types.ts
 
 ---
 
-## Firebase Import
+## Run Tests Locally
 
-Migrating from Firebase Realtime Database? ZerithDB includes a built-in import tool that converts
-Firebase JSON exports into ZerithDB-compatible collection files.
+After cloning and installing dependencies, use the commands below:
 
 ```bash
-# Basic usage — reads Firebase export, writes one JSON file per collection
-node scripts/firebase-import.mjs ./firebase-export.json
+pnpm install
 
-# Custom output directory
-node scripts/firebase-import.mjs ./firebase-export.json --out ./my-collections
+# Run tests across the monorepo (unit/integration)
+pnpm test
+
+# Optional: run tests for a single package while iterating
+pnpm --filter zerithdb-db test
 ```
 
-**How it works:**
+### Notes
 
-- Each **top-level key** in the Firebase export becomes a **ZerithDB collection**
-- Each **child object** becomes a **document** in that collection
-- Arrays and nested objects within documents are **preserved as-is**
-- The original Firebase push key is stored as `_firebaseKey` for traceability
-- No external dependencies — uses only Node.js built-ins
-
-**Example input** (`firebase-export.json`):
-
-```json
-{
-  "users": {
-    "-Mxyz1": { "name": "Alice", "age": 30 },
-    "-Mxyz2": { "name": "Bob", "age": 25 }
-  },
-  "posts": {
-    "-Mabc1": { "title": "Hello", "tags": ["news", "update"] }
-  }
-}
-```
-
-**Example output** (`firebase-import-output/users.json`):
-
-```json
-[
-  { "_firebaseKey": "-Mxyz1", "name": "Alice", "age": 30 },
-  { "_firebaseKey": "-Mxyz2", "name": "Bob", "age": 25 }
-]
-```
+- `pnpm test` runs the current repository test suite via Turborepo.
+- For package-scoped iteration, use `pnpm --filter <package-name> test`.
 
 ---
 

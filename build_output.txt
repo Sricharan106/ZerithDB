@@ -1,0 +1,570 @@
+﻿pnpm : ΓÇó turbo 2.9.12
+At line:1 char:1
++ pnpm turbo build --cache=local:r,remote:r 2>&1 | Out-File -FilePath b ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ΓÇó turbo 2.9.12:String) [], Remo 
+   teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+   ΓÇó Packages in scope: web, zerithdb-auth, zerithdb-cli, zerithdb-core, zerithdb-db, zerithdb-eslint-config, zerithdb-network, zerithdb-react, zerithdb-sdk, zerithdb-signaling-server, zerithdb-sync, zerithdb-tsconfig, zerithdb-utils
+   ΓÇó Running build in 13 packages
+   ΓÇó Remote caching disabled (remote cache requested ΓÇö set TURBO_TOKEN and TURBO_TEAM, or run "turbo login" and "turbo link")
+
+zerithdb-signaling-server:build: cache hit, replaying logs ece2cdd411d91758
+zerithdb-signaling-server:build: 
+zerithdb-signaling-server:build: > zerithdb-signaling-server@0.1.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\infra\signaling-server
+zerithdb-signaling-server:build: > esbuild src/server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --minify
+zerithdb-signaling-server:build: 
+zerithdb-signaling-server:build: 
+zerithdb-signaling-server:build:   dist\server.cjs  47.8kb
+zerithdb-signaling-server:build: 
+zerithdb-signaling-server:build: Done in 468ms
+web:build: cache miss, executing 6a45d5033d447ffb
+zerithdb-utils:build: cache hit, replaying logs cdcec0b5fed069db
+zerithdb-utils:build: 
+zerithdb-utils:build: > zerithdb-utils@0.1.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\utils
+zerithdb-utils:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-utils:build: 
+zerithdb-utils:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-utils:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-utils:build: [34mCLI[39m tsup v8.5.1
+zerithdb-utils:build: [34mCLI[39m Target: es2022
+zerithdb-utils:build: [34mESM[39m Build start
+zerithdb-utils:build: [34mCJS[39m Build start
+zerithdb-utils:build: 
+zerithdb-utils:build: [32mESM[39m [1mdist\index.js [22m[32m1.43 KB[39m
+zerithdb-utils:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-utils:build: [32mESM[39m ΓÜí∩╕Å Build success in 845ms
+zerithdb-utils:build: [32mCJS[39m [1mdist\index.cjs [22m[32m2.71 KB[39m
+zerithdb-utils:build: 
+zerithdb-utils:build: [32mCJS[39m ΓÜí∩╕Å Build success in 853ms
+zerithdb-utils:build:     package.json:14:6:
+zerithdb-utils:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-utils:build: 
+zerithdb-utils:build:     package.json:12:6:
+zerithdb-utils:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-utils:build: 
+zerithdb-utils:build:     package.json:13:6:
+zerithdb-utils:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build: 
+zerithdb-utils:build: 
+zerithdb-utils:build: 
+zerithdb-utils:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-utils:build: 
+zerithdb-utils:build:     package.json:14:6:
+zerithdb-utils:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-utils:build: 
+zerithdb-utils:build:     package.json:12:6:
+zerithdb-utils:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-utils:build: 
+zerithdb-utils:build:     package.json:13:6:
+zerithdb-utils:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-utils:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-utils:build: 
+zerithdb-utils:build: 
+zerithdb-utils:build: 
+zerithdb-utils:build: [34mDTS[39m Build start
+zerithdb-utils:build: [32mDTS[39m ΓÜí∩╕Å Build success in 13574ms
+zerithdb-utils:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m1.46 KB[39m
+zerithdb-utils:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m1.46 KB[39m
+zerithdb-core:build: cache hit, replaying logs 61b75dce9be5f2c7
+zerithdb-core:build: 
+zerithdb-core:build: > zerithdb-core@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\core
+zerithdb-core:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-core:build: 
+zerithdb-core:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-core:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-core:build: [34mCLI[39m tsup v8.5.1
+zerithdb-core:build: [34mCLI[39m Target: es2022
+zerithdb-core:build: [34mESM[39m Build start
+zerithdb-core:build: [34mCJS[39m Build start
+zerithdb-core:build: [32mESM[39m [1mdist\index.js [22m[32m2.53 KB[39m
+zerithdb-core:build: 
+zerithdb-core:build: [32mESM[39m ΓÜí∩╕Å Build success in 349ms
+zerithdb-core:build: [32mCJS[39m [1mdist\index.cjs [22m[32m3.61 KB[39m
+zerithdb-core:build: [32mCJS[39m ΓÜí∩╕Å Build success in 349ms
+zerithdb-core:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:14:6:
+zerithdb-core:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-core:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:12:6:
+zerithdb-core:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-core:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:13:6:
+zerithdb-core:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-core:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build: 
+zerithdb-core:build: 
+zerithdb-core:build: 
+zerithdb-core:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:14:6:
+zerithdb-core:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-core:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:12:6:
+zerithdb-core:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-core:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-core:build: 
+zerithdb-core:build:     package.json:13:6:
+zerithdb-core:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-core:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-core:build: 
+zerithdb-core:build: 
+zerithdb-core:build: 
+zerithdb-core:build: [34mDTS[39m Build start
+zerithdb-core:build: [32mDTS[39m ΓÜí∩╕Å Build success in 4584ms
+zerithdb-core:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m6.71 KB[39m
+zerithdb-core:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m6.71 KB[39m
+zerithdb-db:build: cache hit, replaying logs f8b82a33ee10ac42
+zerithdb-db:build: 
+zerithdb-cli:build: cache hit, replaying logs 1e12cb5ddc757fd7
+zerithdb-db:build: > zerithdb-db@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\db
+zerithdb-db:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-db:build: 
+zerithdb-db:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-db:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-db:build: [34mCLI[39m tsup v8.5.1
+zerithdb-db:build: [34mCLI[39m Target: es2022
+zerithdb-db:build: [34mESM[39m Build start
+zerithdb-db:build: [34mCJS[39m Build start
+zerithdb-db:build: 
+zerithdb-db:build: [32mESM[39m [1mdist\index.js [22m[32m5.83 KB[39m
+zerithdb-db:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-db:build: 
+zerithdb-db:build: [32mESM[39m ΓÜí∩╕Å Build success in 359ms
+zerithdb-db:build: [32mCJS[39m [1mdist\index.cjs [22m[32m7.80 KB[39m
+zerithdb-db:build: [32mCJS[39m ΓÜí∩╕Å Build success in 381ms
+zerithdb-db:build:     package.json:14:6:
+zerithdb-db:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-db:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-db:build: 
+zerithdb-db:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-db:build: 
+zerithdb-db:build:     package.json:12:6:
+zerithdb-db:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-db:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-db:build: 
+zerithdb-cli:build: 
+zerithdb-db:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-cli:build: > zerithdb-cli@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\cli
+zerithdb-db:build: 
+zerithdb-cli:build: > tsup src/cli.ts --format esm
+zerithdb-db:build:     package.json:13:6:
+zerithdb-cli:build: 
+zerithdb-db:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-cli:build: [34mCLI[39m Building entry: src/cli.ts
+zerithdb-db:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-cli:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-db:build: 
+zerithdb-cli:build: [34mCLI[39m tsup v8.5.1
+zerithdb-db:build: 
+zerithdb-cli:build: [34mCLI[39m Target: es2022
+zerithdb-db:build: 
+zerithdb-cli:build: [34mESM[39m Build start
+zerithdb-db:build: 
+zerithdb-cli:build: [32mESM[39m [1mdist\cli.js [22m[32m9.37 KB[39m
+zerithdb-db:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-cli:build: [32mESM[39m ΓÜí∩╕Å Build success in 1009ms
+zerithdb-db:build: 
+zerithdb-db:build:     package.json:14:6:
+zerithdb-db:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-db:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-db:build: 
+zerithdb-db:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-db:build: 
+zerithdb-db:build:     package.json:12:6:
+zerithdb-db:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-db:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-db:build: 
+zerithdb-db:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-db:build: 
+zerithdb-db:build:     package.json:13:6:
+zerithdb-db:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-db:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-db:build: 
+zerithdb-db:build: 
+zerithdb-db:build: 
+zerithdb-db:build: [34mDTS[39m Build start
+zerithdb-db:build: [32mDTS[39m ΓÜí∩╕Å Build success in 7862ms
+zerithdb-db:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m2.21 KB[39m
+zerithdb-db:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m2.21 KB[39m
+zerithdb-auth:build: cache hit, replaying logs 292942cf65fbde7c
+zerithdb-auth:build: 
+zerithdb-auth:build: > zerithdb-auth@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\auth
+zerithdb-auth:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-auth:build: 
+zerithdb-auth:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-auth:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-auth:build: [34mCLI[39m tsup v8.5.1
+zerithdb-auth:build: [34mCLI[39m Target: es2022
+zerithdb-auth:build: [34mESM[39m Build start
+zerithdb-auth:build: [34mCJS[39m Build start
+zerithdb-auth:build: 
+zerithdb-auth:build: [32mESM[39m [1mdist\index.js [22m[32m3.98 KB[39m
+zerithdb-auth:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-auth:build: 
+zerithdb-auth:build: [32mESM[39m ΓÜí∩╕Å Build success in 369ms
+zerithdb-auth:build:     package.json:14:6:
+zerithdb-auth:build: [32mCJS[39m [1mdist\index.cjs [22m[32m5.67 KB[39m
+zerithdb-auth:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-auth:build: [32mCJS[39m ΓÜí∩╕Å Build success in 405ms
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-auth:build: 
+zerithdb-auth:build:     package.json:12:6:
+zerithdb-auth:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-auth:build: 
+zerithdb-auth:build:     package.json:13:6:
+zerithdb-auth:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build: 
+zerithdb-auth:build: 
+zerithdb-auth:build: 
+zerithdb-auth:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-auth:build: 
+zerithdb-auth:build:     package.json:14:6:
+zerithdb-auth:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-auth:build: 
+zerithdb-auth:build:     package.json:12:6:
+zerithdb-auth:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-auth:build: 
+zerithdb-auth:build:     package.json:13:6:
+zerithdb-auth:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-auth:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-auth:build: 
+zerithdb-auth:build: 
+zerithdb-auth:build: 
+zerithdb-auth:build: [34mDTS[39m Build start
+zerithdb-auth:build: [32mDTS[39m ΓÜí∩╕Å Build success in 7833ms
+zerithdb-auth:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m1.63 KB[39m
+zerithdb-auth:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m1.63 KB[39m
+zerithdb-network:build: cache hit, replaying logs 401fc91201be6d14
+zerithdb-network:build: 
+zerithdb-network:build: > zerithdb-network@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\network
+zerithdb-network:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-network:build: 
+zerithdb-network:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-network:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-network:build: [34mCLI[39m tsup v8.5.1
+zerithdb-network:build: [34mCLI[39m Target: es2022
+zerithdb-network:build: [34mESM[39m Build start
+zerithdb-network:build: [34mCJS[39m Build start
+zerithdb-network:build: 
+zerithdb-network:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-network:build: 
+zerithdb-network:build:     package.json:14:6:
+zerithdb-network:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-network:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-network:build: 
+zerithdb-network:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-network:build: 
+zerithdb-network:build:     package.json:12:6:
+zerithdb-network:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-network:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-network:build: [32mESM[39m [1mdist\index.js [22m[32m5.53 KB[39m
+zerithdb-network:build: 
+zerithdb-network:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-network:build: [32mESM[39m ΓÜí∩╕Å Build success in 170ms
+zerithdb-network:build: 
+zerithdb-network:build: [32mCJS[39m [1mdist\index.cjs [22m[32m7.25 KB[39m
+zerithdb-network:build: [32mCJS[39m ΓÜí∩╕Å Build success in 170ms
+zerithdb-network:build:     package.json:13:6:
+zerithdb-network:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-network:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-network:build: 
+zerithdb-network:build: 
+zerithdb-network:build: 
+zerithdb-network:build: 
+zerithdb-network:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-network:build: 
+zerithdb-network:build:     package.json:14:6:
+zerithdb-network:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-network:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-network:build: 
+zerithdb-network:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-network:build: 
+zerithdb-network:build:     package.json:12:6:
+zerithdb-network:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-network:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-network:build: 
+zerithdb-network:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-network:build: 
+zerithdb-network:build:     package.json:13:6:
+zerithdb-network:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-network:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-network:build: 
+zerithdb-network:build: 
+zerithdb-network:build: 
+zerithdb-network:build: [34mDTS[39m Build start
+zerithdb-network:build: [32mDTS[39m ΓÜí∩╕Å Build success in 4769ms
+zerithdb-network:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m1.87 KB[39m
+zerithdb-network:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m1.87 KB[39m
+zerithdb-sync:build: cache hit, replaying logs 0f0d9c619042ce6b
+zerithdb-sync:build: 
+zerithdb-sync:build: > zerithdb-sync@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\sync
+zerithdb-sync:build: > tsup src/index.ts --format esm,cjs --dts
+zerithdb-sync:build: 
+zerithdb-sync:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-sync:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-sync:build: [34mCLI[39m tsup v8.5.1
+zerithdb-sync:build: [34mCLI[39m Target: es2022
+zerithdb-sync:build: [34mESM[39m Build start
+zerithdb-sync:build: [34mCJS[39m Build start
+zerithdb-sync:build: 
+zerithdb-sync:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-sync:build: [32mESM[39m [1mdist\index.js [22m[32m4.01 KB[39m
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:14:6:
+zerithdb-sync:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-sync:build: [32mESM[39m ΓÜí∩╕Å Build success in 201ms
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build: [32mCJS[39m [1mdist\index.cjs [22m[32m5.65 KB[39m
+zerithdb-sync:build: [32mCJS[39m ΓÜí∩╕Å Build success in 237ms
+zerithdb-sync:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:12:6:
+zerithdb-sync:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:13:6:
+zerithdb-sync:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build: 
+zerithdb-sync:build: 
+zerithdb-sync:build: 
+zerithdb-sync:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:14:6:
+zerithdb-sync:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:12:6:
+zerithdb-sync:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-sync:build: 
+zerithdb-sync:build:     package.json:13:6:
+zerithdb-sync:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-sync:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-sync:build: 
+zerithdb-sync:build: 
+zerithdb-sync:build: 
+zerithdb-sync:build: [34mDTS[39m Build start
+zerithdb-sync:build: [32mDTS[39m ΓÜí∩╕Å Build success in 5109ms
+zerithdb-sync:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m1.86 KB[39m
+zerithdb-sync:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m1.86 KB[39m
+zerithdb-sdk:build: cache hit, replaying logs 3ff2515d9a860f38
+zerithdb-sdk:build: 
+zerithdb-sdk:build: > zerithdb-sdk@0.2.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\sdk
+zerithdb-sdk:build: > tsup src/index.ts --format esm,cjs --dts --treeshake
+zerithdb-sdk:build: 
+zerithdb-sdk:build: [34mCLI[39m Building entry: src/index.ts
+zerithdb-sdk:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-sdk:build: [34mCLI[39m tsup v8.5.1
+zerithdb-sdk:build: [34mCLI[39m Target: es2022
+zerithdb-sdk:build: [34mESM[39m Build start
+zerithdb-sdk:build: [34mCJS[39m Build start
+zerithdb-sdk:build: 
+zerithdb-sdk:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:29:6:
+zerithdb-sdk:build: [37m      29 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:27:6:
+zerithdb-sdk:build: [37m      27 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:28:6:
+zerithdb-sdk:build: [37m      28 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build: 
+zerithdb-sdk:build: 
+zerithdb-sdk:build: 
+zerithdb-sdk:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:29:6:
+zerithdb-sdk:build: [37m      29 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:27:6:
+zerithdb-sdk:build: [37m      27 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-sdk:build: 
+zerithdb-sdk:build:     package.json:28:6:
+zerithdb-sdk:build: [37m      28 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-sdk:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-sdk:build: 
+zerithdb-sdk:build: 
+zerithdb-sdk:build: 
+zerithdb-sdk:build: "CollectionClient" is imported from external module "zerithdb-db" but never used in "dist/index.js".
+zerithdb-sdk:build: "CollectionClient" is imported from external module "zerithdb-db" but never used in "dist/index.cjs".
+zerithdb-sdk:build: [32mESM[39m [1mdist\index.js [22m[32m1.29 KB[39m
+zerithdb-sdk:build: [32mESM[39m ΓÜí∩╕Å Build success in 324ms
+zerithdb-sdk:build: [32mCJS[39m [1mdist\index.cjs [22m[32m1.60 KB[39m
+zerithdb-sdk:build: [32mCJS[39m ΓÜí∩╕Å Build success in 326ms
+zerithdb-sdk:build: [34mDTS[39m Build start
+zerithdb-sdk:build: [32mDTS[39m ΓÜí∩╕Å Build success in 4727ms
+zerithdb-sdk:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m2.30 KB[39m
+zerithdb-sdk:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m2.30 KB[39m
+zerithdb-react:build: cache hit, replaying logs 48210361f51e9cff
+zerithdb-react:build: 
+zerithdb-react:build: > zerithdb-react@0.1.1 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\packages\react
+zerithdb-react:build: > tsup src/index.tsx --format esm,cjs --dts --treeshake --external react
+zerithdb-react:build: 
+zerithdb-react:build: [34mCLI[39m Building entry: src/index.tsx
+zerithdb-react:build: [34mCLI[39m Using tsconfig: tsconfig.json
+zerithdb-react:build: [34mCLI[39m tsup v8.5.1
+zerithdb-react:build: [34mCLI[39m Target: es2022
+zerithdb-react:build: [34mESM[39m Build start
+zerithdb-react:build: [34mCJS[39m Build start
+zerithdb-react:build: 
+zerithdb-react:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-react:build: [32mCJS[39m [1mdist\index.cjs [22m[32m1.49 KB[39m
+zerithdb-react:build: [32mCJS[39m ΓÜí∩╕Å Build success in 2976ms
+zerithdb-react:build: [32mESM[39m [1mdist\index.js [22m[32m1.41 KB[39m
+zerithdb-react:build: [32mESM[39m ΓÜí∩╕Å Build success in 2977ms
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:14:6:
+zerithdb-react:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-react:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-react:build: 
+zerithdb-react:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:12:6:
+zerithdb-react:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-react:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-react:build: 
+zerithdb-react:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:13:6:
+zerithdb-react:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-react:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-react:build: [34mDTS[39m Build start
+zerithdb-react:build: 
+zerithdb-react:build: 
+zerithdb-react:build: 
+zerithdb-react:build: 
+zerithdb-react:build: [43m[30m WARN [39m[49m [33mΓû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:14:6:
+zerithdb-react:build: [37m      14 Γöé       [32m"types"[37m: "./dist/index.d.ts"
+zerithdb-react:build:          Γò╡       [32m~~~~~~~[0m
+zerithdb-react:build: 
+zerithdb-react:build:   The "import" condition comes earlier and will be used for all "import" statements:
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:12:6:
+zerithdb-react:build: [37m      12 Γöé       [32m"import"[37m: "./dist/index.js",
+zerithdb-react:build:          Γò╡       [32m~~~~~~~~[0m
+zerithdb-react:build: 
+zerithdb-react:build:   The "require" condition comes earlier and will be used for all "require" calls:
+zerithdb-react:build: 
+zerithdb-react:build:     package.json:13:6:
+zerithdb-react:build: [37m      13 Γöé       [32m"require"[37m: "./dist/index.cjs",
+zerithdb-react:build:          Γò╡       [32m~~~~~~~~~[0m
+zerithdb-react:build: 
+zerithdb-react:build: 
+zerithdb-react:build: 
+zerithdb-react:build: [32mDTS[39m ΓÜí∩╕Å Build success in 13082ms
+zerithdb-react:build: [32mDTS[39m [1mdist\index.d.ts  [22m[32m836.00 B[39m
+zerithdb-react:build: [32mDTS[39m [1mdist\index.d.cts [22m[32m836.00 B[39m
+web:build: 
+web:build: > web@0.1.0 build C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\apps\web
+web:build: > next build
+web:build: 
+web:build: ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+web:build:  We detected multiple lockfiles and selected the directory of C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\pnpm-workspace.yaml as the root directory.
+web:build:  To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+web:build:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+web:build:  Detected additional lockfiles: 
+web:build:    * C:\Users\Rushabh Mahajan\Documents\GitHub\ZerithDB\apps\web\pnpm-workspace.yaml
+web:build: 
+web:build: Γû▓ Next.js 16.2.6 (Turbopack)
+web:build: 
+web:build:   Creating an optimized production build ...
+web:build: Γ£ô Compiled successfully in 38.0s
+web:build:   Running TypeScript ...
+web:build:   Finished TypeScript in 37.3s ...
+web:build:   Collecting page data using 3 workers ...
+web:build:   Generating static pages using 3 workers (0/6) ...
+web:build:   Generating static pages using 3 workers (1/6) 
+web:build:   Generating static pages using 3 workers (2/6) 
+web:build:   Generating static pages using 3 workers (4/6) 
+web:build: Γ£ô Generating static pages using 3 workers (6/6) in 1967ms
+web:build:   Finalizing page optimization ...
+web:build: 
+web:build: Route (app)
+web:build: Γöî Γùï /
+web:build: Γö£ Γùï /_not-found
+web:build: Γö£ ╞Æ /[locale]
+web:build: Γö£ ╞Æ /[locale]/docs
+web:build: Γö£ ╞Æ /[locale]/playground
+web:build: Γö£ Γùï /docs
+web:build: Γöö Γùï /playground
+web:build: 
+web:build: 
+web:build: ╞Æ Proxy (Middleware)
+web:build: 
+web:build: Γùï  (Static)   prerendered as static content
+web:build: ╞Æ  (Dynamic)  server-rendered on demand
+web:build: 
+
+ Tasks:    11 successful, 11 total
+Cached:    10 cached, 11 total
+  Time:    1m43.587s 
+

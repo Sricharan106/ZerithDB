@@ -37,6 +37,9 @@ dev = [
 line-length = 88
 target-version = "py310"
 
+[tool.ruff.format]
+quote-style = "double"
+
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true

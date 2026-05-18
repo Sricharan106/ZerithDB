@@ -5,8 +5,6 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   ArrowLeft,
-  Copy,
-  Check,
   Terminal,
   Search,
   Book,
@@ -18,8 +16,14 @@ import {
   FileText,
   Menu,
   X,
+  Shield,
+  Brain,
+  ShoppingCart,
+  MessageSquare,
+  Smartphone,
+  Gamepad2,
 } from "lucide-react";
-
+import CopyCodeBlock from "@/components/CopyCodeBlock";
 type Framework = {
   id: string;
   name: string;
@@ -109,6 +113,11 @@ const SIDEBAR_LINKS = [
       "Offline-First Storage",
       "Conflict Resolution",
     ],
+  },
+  {
+    category: "Applications",
+    icon: Globe,
+    items: ["Real-World Applications"],
   },
   {
     category: "API Reference",
@@ -238,89 +247,36 @@ const DOC_CONTENT: Record<string, React.ReactNode> = {
       </p>
     </div>
   ),
-  Troubleshooting: (
+  "Conflict Resolution": (
     <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
       <p>
-        Because ZerithDB is a local-first application platform operating entirely in the browser, it
-        avoids traditional centralized server bottlenecks by forming a resilient, encrypted mesh
-        network among peers. This decentralized synchronization relies heavily on browser-level
-        WebRTC connections orchestrated initially via a minimal signaling server.
+        ZerithDB ensures all peers eventually converge to the same state using{" "}
+        <strong>Last-Write-Wins (LWW)</strong> and <strong>Causal Ordering</strong> via vector
+        clocks.
       </p>
-      <p>
-        However, real-world network configurations (firewalls, asymmetric NATs, and strict browser
-        sandboxing) can occasionally prevent peers from handshaking or maintaining active data
-        streams. Use this guide to diagnose and resolve common connectivity issues.
-      </p>
-
-      <h3
-        id="webrtc-nat-issue"
-        className="text-2xl font-bold text-gray-900 mt-12 mb-4 scroll-mt-20"
-      >
-        1. Initial Connection Fails Between Peers on Different Networks
-      </h3>
-      <ul className="list-disc pl-6 space-y-3">
-        <li>
-          <strong>Symptom:</strong> Peers on the same Wi-Fi network sync instantly, but a peer on a
-          home network cannot connect to a peer on a corporate network or cellular data.
-        </li>
-        <li>
-          <strong>Cause:</strong> This is typically caused by a NAT (Network Address Translation) or
-          firewall restriction blocking direct P2P socket discovery. While simple STUN mapping
-          handles basic routers, strict enterprise or symmetric NATs hide the internal IP/Port
-          mapping dynamically, preventing direct connections via standard ICE candidates.
-        </li>
-        <li>
-          <strong>Solution:</strong> You need a TURN (Traversal Using Relays around NAT) server to
-          safely fallback and relay encrypted traffic between strict networks. Configure your
-          initialization to supply custom ICE servers:
-        </li>
-      </ul>
-
-      <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm group mt-6">
-        <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-mono text-gray-500">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-green-400"></span>
-            <span className="ml-2 font-medium">app.config.ts</span>
-          </div>
-        </div>
-        <div className="p-6 bg-gray-900 overflow-x-auto">
-          <pre className="text-[13px] font-mono text-gray-300 leading-relaxed">
-            <code>
-              {`import { createApp } from "zerithdb-sdk";
-
-const app = createApp({
-  appId: "my-secure-app",
-  sync: {
-    signalingUrl: "wss://signal.zerithdb.dev",
-    // Supply explicit TURN/STUN configuration for restrictive firewalls
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      {
-        urls: "turn:your-custom-turn-server.com:3478",
-        username: "zerith_user",
-        credential: "secure_password_here"
-      }
-    ]
-  }
-});`}
-            </code>
-          </pre>
-        </div>
+      <h3 className="text-2xl font-bold text-gray-900 mt-12 mb-4">The Resolver Algorithm</h3>
+      <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 font-mono text-sm text-blue-400">
+        {
+          "// Internal resolution logic\nif (incoming.timestamp > local.timestamp) {\n  applyUpdate(incoming);\n} else if (incoming.timestamp === local.timestamp) {\n  // Deterministic tie-break using peer IDs\n  if (incoming.peerId > local.peerId) applyUpdate(incoming);\n}"
+        }
       </div>
-
-      <h3
-        id="connection-drops"
-        className="text-2xl font-bold text-gray-900 mt-12 mb-4 scroll-mt-20"
-      >
-        2. Connection Drops After Inactivity
-      </h3>
       <p>
-        Some aggressive NAT routers close UDP mappings if no data is exchanged for a short period
-        (usually 30-60 seconds). ZerithDB automatically sends keep-alive heartbeats, but you can
-        adjust the interval if you notice frequent reconnections on specific networks.
+        This ensures that no matter what order updates arrive in, every client will compute the
+        exact same final state without needing a central coordinator.
       </p>
+    </div>
+  ),
+  "Client Configuration": (
+    <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
+      <p>
+        The <code>createClient</code> function accepts a configuration object to tune your P2P and
+        storage settings.
+      </p>
+      <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 font-mono text-sm text-gray-300">
+        {
+          "const db = createClient({\n  appId: 'project-xyz',\n  storage: 'indexeddb', // or 'memory'\n  sync: {\n    p2p: true,\n    rtcConfig: { iceServers: [...] }\n  }\n});"
+        }
+      </div>
     </div>
   ),
 };
@@ -328,30 +284,7 @@ const app = createApp({
 export default function DocsPage() {
   const [activeId, setActiveId] = useState("react");
   const [activeSection, setActiveSection] = useState("Quickstart");
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [copiedInstall, setCopiedInstall] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
   const activeFramework = FRAMEWORKS.find((f) => f.id === activeId) || FRAMEWORKS[0];
-
-  const handleCopy = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-  };
-
-  const handleCopyInstall = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedInstall(true);
-    setTimeout(() => setCopiedInstall(false), 2000);
-  };
-
-  const slugify = (text: string) => {
-    return text
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
-  };
 
   // Render specific content if available, otherwise generic text
   const renderContent = () => {
@@ -371,8 +304,8 @@ export default function DocsPage() {
                 className={
                   "px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px " +
                   (activeId === fw.id
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border")
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-slate-600 dark:text-muted-foreground hover:text-foreground hover:border-border")
                 }
               >
                 {fw.name}
@@ -388,36 +321,29 @@ export default function DocsPage() {
               <Terminal className="w-5 h-5 text-muted-foreground" />
               Install the SDK
             </h2>
-            <div className="flex items-center justify-between bg-slate-950/95 dark:bg-slate-950 rounded-xl p-4 shadow-sm border border-slate-800/90 transition-colors duration-300">
-              <code className="text-sm font-mono text-slate-200">{activeFramework.install}</code>
-              <button
-                onClick={() => handleCopyInstall(activeFramework.install)}
-                className="p-2 hover:bg-slate-800 rounded-md transition-colors text-muted-foreground hover:text-foreground"
-                title="Copy command"
-              >
-                {copiedInstall ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-800">
+              <CopyCodeBlock code={activeFramework.install} language="bash" />
             </div>
           </div>
 
           <div className="space-y-12">
             {activeFramework.steps.map((step, idx) => (
-              <div key={idx} className="relative">
-                <h3
-                  id={slugify(step.title)}
-                  className="text-lg font-bold text-foreground mb-2 scroll-mt-20 transition-colors duration-300"
-                >
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground mb-4 transition-colors duration-300">
+              <div key={idx} className="group">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 flex items-center justify-center text-xs font-bold border border-blue-100 dark:border-blue-800 transition-colors duration-300">
+                    {idx + 1}
+                  </div>
+                  <h3
+                    id={slugify(step.title)}
+                    className="text-lg font-bold text-foreground group-hover:text-blue-600 transition-colors scroll-mt-20 duration-300"
+                  >
+                    {step.title}
+                  </h3>
+                </div>
+                <p className="text-muted-foreground mb-4 ml-10 transition-colors duration-300">
                   {step.description}
                 </p>
-
-                <div className="rounded-xl border border-border overflow-hidden shadow-sm group transition-colors duration-300">
+                <div className="ml-10 relative group/code bg-muted border border-border rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
                   <div className="bg-muted border-b border-border px-4 py-2.5 flex items-center justify-between transition-colors duration-300">
                     <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
                       <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
@@ -425,22 +351,12 @@ export default function DocsPage() {
                       <span className="w-2.5 h-2.5 rounded-full bg-green-400"></span>
                       <span className="ml-2 font-medium">example.{activeFramework.language}</span>
                     </div>
-                    <button
-                      onClick={() => handleCopy(step.code, idx)}
-                      className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    >
-                      {copiedIndex === idx ? (
-                        <Check className="w-3.5 h-3.5 text-green-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                      {copiedIndex === idx ? "Copied" : "Copy"}
-                    </button>
+                    
                   </div>
-                  <div className="p-6 bg-slate-950/95 dark:bg-slate-950 overflow-x-auto rounded-2xl border border-slate-800/90 transition-colors duration-300">
-                    <pre className="text-[13px] font-mono text-slate-200 leading-relaxed">
-                      <code>{step.code}</code>
-                    </pre>
+                  <div className="p-6 bg-gray-900 overflow-x-auto">
+                    <CopyCodeBlock code={step.code} language="typescript" />
+                    
+                  
                   </div>
                 </div>
               </div>
@@ -449,7 +365,7 @@ export default function DocsPage() {
 
           <div
             id="next-steps"
-            className="mt-16 p-8 bg-muted rounded-2xl border border-border shadow-sm relative overflow-hidden scroll-mt-20 transition-colors duration-300"
+            className="mt-16 p-8 bg-gradient-to-br from-muted/50 to-background rounded-2xl border border-border shadow-sm relative overflow-hidden scroll-mt-20 transition-colors duration-300"
           >
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
               <Zap className="w-32 h-32" />
@@ -551,11 +467,7 @@ export default function DocsPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-300">
       <header className="bg-background border-b border-border px-6 h-16 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
         <div className="flex items-center gap-4">
-
-          <button
-            className="lg:hidden text-foreground"
-            onClick={() => setMobileSidebarOpen(true)}
-          >
+          <button className="lg:hidden text-foreground" onClick={() => setMobileSidebarOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
           <Link
@@ -590,6 +502,12 @@ export default function DocsPage() {
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Playground
+          </Link>
+          <Link
+            href="/docs/schema-builder"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Schema Builder
           </Link>
           <a
             href="https://github.com/Zerith-Labs/ZerithDB"

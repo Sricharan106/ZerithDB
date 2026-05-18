@@ -1,4 +1,5 @@
 """Smoke tests for the ZerithDB Python SDK."""
+
 import pytest
 from zerithdb import ZerithClient
 
@@ -27,9 +28,11 @@ def test_db_state_initial():
 async def test_insert_adds_to_state():
     """Inserting a record should add it to the in-memory state (without connecting)."""
     client = ZerithClient()
+
     # Manually stub the broadcast so we don't need a real connection
     async def _noop(msg):
         pass
+
     client.network.broadcast = _noop  # type: ignore[method-assign]
 
     await client.insert("users", {"id": "u1", "name": "Alice"})

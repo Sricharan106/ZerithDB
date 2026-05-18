@@ -1,0 +1,21 @@
+{
+  "name": "zerithdb-signaling-edge",
+  "version": "0.1.0",
+  "description": "Edge-computing signaling server for ZerithDB",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240512.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "zerithdb-tsconfig": "workspace:*"
+  }
+}

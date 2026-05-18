@@ -11,7 +11,7 @@
     "sync",
     "database"
   ],
-  "homepage": "https://zerithdb.dev",
+  "homepage": "https://zerithdb.netlify.app",
   "repository": {
     "type": "git",
     "url": "https://github.com/Zerith-Labs/ZerithDB.git",
@@ -45,7 +45,16 @@
     "zerithdb-devtools": "workspace:*",
     "zerithdb-network": "workspace:*",
     "zerithdb-sync": "workspace:*",
-    "zerithdb-errors": "workspace:*"
+    "zerithdb-errors": "workspace:*",
+    "zerithdb-wallet": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^3.x"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "zerithdb-eslint-config": "workspace:*",
@@ -59,14 +68,7 @@
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   },
-  "peerDependencies": {
-    "zod": "^3.x"
-  },
-  "peerDependenciesMeta": {
-    "zod": {
-      "optional": true
-    }
-  },
+
   "files": [
     "dist",
     "src"

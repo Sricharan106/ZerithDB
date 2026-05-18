@@ -36,7 +36,8 @@ networking.
 
 ## Recommended Reading Guide
 
-This document is designed for contributors, integrators, and developers who want a deeper understanding of ZerithDB internals.
+This document is designed for contributors, integrators, and developers who want a deeper
+understanding of ZerithDB internals.
 
 Suggested reading flow:
 
@@ -46,8 +47,7 @@ Suggested reading flow:
 4. Data Flow Lifecycle
 5. Engineering Challenges
 
-Reading in this order provides a clearer understanding of how the different ZerithDB packages interact internally.
----
+## Reading in this order provides a clearer understanding of how the different ZerithDB packages interact internally.
 
 ## System Architecture
 
@@ -219,6 +219,20 @@ by Yjs using a deterministic timestamp + client ID tie-break. No user interventi
 - Key rotation requires migrating documents (tracked in Roadmap).
 - No revocation mechanism yet.
 - Hardware key support (WebAuthn) is on the v0.5 roadmap.
+
+---
+
+### UCAN-based Capabilities
+
+ZerithDB uses UCANs (User Controlled Authorization Networks) for decentralized access control.  
+- **Delegation**: `auth.delegate(targetDid, capabilities, options)` returns a signed UCAN.  
+- **Enforcement**: Sync engine and DB client check UCANs before allowing reads/writes.  
+- **Attenuation**: Delegated capabilities are always a subset of the original.  
+- **Expiration**: Short-lived UCANs (default 1 hour) prevent indefinite access.
+
+Capability resource URIs follow the pattern:  
+`zerithdb://{appId}/{collection}/{optionalDocId}`  
+Wildcards: `zerithdb://my-app/todos/*` grants access to all documents in the `todos` collection.
 
 ---
 

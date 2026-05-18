@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/platforms/vercel.ts": {
+      "runtime": "edge"
+    }
+  }
+}

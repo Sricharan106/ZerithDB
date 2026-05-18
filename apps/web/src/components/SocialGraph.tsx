@@ -157,12 +157,14 @@ export default function SocialGraph() {
         {peers.map((peer) => (
           <div
             key={peer.name}
-            title={`${peer.name}
-Status: ${peer.status}
-Trust Score: ${peer.trust}
-Latency: ${peer.latency}`}
+            role="button"
+            tabIndex={0}
+            aria-label={`${peer.name}: ${peer.status}, Trust ${peer.trust}, Latency ${peer.latency}`}
             onMouseEnter={() => setActivePeer(peer.name)}
             onMouseLeave={() => setActivePeer(null)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setActivePeer(peer.name);
+            }}
             style={{
               position: "absolute",
               top: peer.top,

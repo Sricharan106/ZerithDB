@@ -1,149 +1,272 @@
-# `zerithdb-sdk`
+# zerithdb-sdk
 
-The **ZerithDB SDK** is the primary entry point for building local-first, peer-to-peer applications. It orchestrates the database, synchronization engine, authentication manager, and network layer into a single, easy-to-use client.
+The official JavaScript/TypeScript SDK for [ZerithDB](https://zerithdb.netlify.app/) — a
+local-first, peer-to-peer, CRDT-powered browser-native database platform.
 
-[![npm version](https://img.shields.io/npm/v/zerithdb-sdk.svg)](https://www.npmjs.com/package/zerithdb-sdk)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](../../LICENSE)
+Build full-stack apps with **zero backend**. The browser is the server.
 
-## 📦 Installation
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Core APIs](#core-apis)
+  - [createApp](#createapp)
+  - [Database Operations](#database-operations)
+  - [Sync API](#sync-api)
+  - [Auth API](#auth-api)
+- [Framework Integrations](#framework-integrations)
+- [Architecture](#architecture)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Installation
 
 ```bash
 npm install zerithdb-sdk
 ```
 
-## 🚀 Quick Start
+For React projects:
+
+```bash
+npm install zerithdb-sdk zerithdb-react
+```
+
+---
+
+## Quick Start
 
 ```typescript
 import { createApp } from "zerithdb-sdk";
 
-// 1. Initialize the app
 const app = createApp({
-  appId: "my-awesome-app",
-  sync: { signalingUrl: "wss://signal.zerithdb.dev" }
+  appId: "my-app-unique-id",
+  sync: {
+    signalingUrl: "wss://signal.zerithdb.dev", // optional: hosted relay
+    // or: signalingUrl: "ws://localhost:4000"  // self-hosted
+  },
 });
 
-// 2. Write data — persisted locally to IndexedDB immediately
-const todos = app.db("todos");
-await todos.insert({ text: "Build something great", done: false });
+// Write data — persisted locally via IndexedDB
+await app.db("todos").insert({ text: "Ship ZerithDB v1", done: false });
 
-// 3. Enable P2P sync — connect to peers and share updates
+// Query with a MongoDB-like API
+const todos = await app.db("todos").find({ done: false });
+
+// Enable real-time P2P sync
 app.sync.enable();
 
-// 4. Reactive subscriptions
-todos.subscribe((allTodos) => {
-  console.log("Updated todos:", allTodos);
+// Authenticate with a keypair (no passwords, no servers)
+const identity = await app.auth.signIn();
+console.log(identity.publicKey); // "did:key:z6Mk..."
+```
+
+---
+
+## Core APIs
+
+### `createApp`
+
+Initializes a new ZerithDB app instance.
+
+```typescript
+import { createApp } from "zerithdb-sdk";
+
+const app = createApp({
+  appId: "my-app",        // namespaces your local DB
+  sync: {
+    signalingUrl: "wss://signal.zerithdb.dev",
+  },
 });
 ```
 
-## 🛠️ Core API Reference
+| Option | Type | Required | Description |
+|---|---|---|---|
+| `appId` | `string` | ✅ | Unique namespace for your local database |
+| `sync.signalingUrl` | `string` | ❌ | WebSocket URL of the signaling server for P2P |
 
-### `createApp(config)`
+---
 
-Initializes a new ZerithDB instance.
+### Database Operations
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `appId` | `string` | **Required** | Unique namespace for your app's data. |
-| `sync.signalingUrl` | `string` | `"wss://signal.zerithdb.dev"` | WebSocket URL for the signaling server. |
-| `sync.maxPeers` | `number` | `10` | Maximum number of concurrent peer connections. |
-| `auth.storageKey` | `string` | `"__zerithdb_identity"` | Key used to store identity in localStorage. |
-| `logLevel` | `string` | `"warn"` | Console log level (`debug`, `info`, `warn`, `error`). |
+```typescript
+const db = app.db("collection-name");
 
-### Database Operations (`app.db(name)`)
+// Insert a document
+await db.insert({ text: "Hello", done: false });
 
-Returns a collection handle for performing CRUD operations.
+// Find documents (MongoDB-style query)
+const results = await db.find({ done: false });
 
-- **`insert(doc)`**: Adds a new document. Returns `{ id }`.
-- **`find(filter)`**: Queries documents using MongoDB-style filters (e.g., `{ status: "active" }`).
-- **`update(filter, spec)`**: Updates matching documents (e.g., `{ $set: { done: true } }`).
-- **`delete(filter)`**: Removes matching documents.
-- **`subscribe(callback)`**: Listens for changes and triggers on every local or remote update.
+// Find a single document
+const item = await db.findOne({ id: "abc123" });
 
-### Sync API (`app.sync`)
+// Update a document
+await db.update("doc-id", { done: true });
 
-Manages the CRDT synchronization engine.
+// Delete a document
+await db.delete("doc-id");
 
-- **`enable()`**: Starts the P2P synchronization process.
-- **`forceSync()`**: Manually triggers an immediate synchronization cycle.
-- **`flush()`**: Forces a push of all pending local updates to connected peers.
+// Live / reactive query (fires on every change)
+db.subscribe({ done: false }, (results) => {
+  console.log("Updated results:", results);
+});
+```
 
-> For advanced sync strategies, see the [FORCE_SYNC.md](./FORCE_SYNC.md) guide.
+---
 
-### Auth API (`app.auth`)
+### Sync API
 
-Handles self-sovereign identity using Ed25519 keypairs.
+ZerithDB syncs automatically, but you can also trigger a sync round manually:
 
-- **`signIn()`**: Loads an existing identity from storage or generates a new one.
-- **`signOut()`**: Clears the local identity.
-- **`get identity`**: Returns the current `Identity` (publicKey, etc.).
+```typescript
+// Enable automatic P2P sync
+app.sync.enable();
 
-## 🔌 Framework Integration
+// Force a full sync with all connected peers
+await app.sync.forceSync();
+
+// Force sync with a specific peer
+await app.sync.forceSyncWith("did:key:z6Mk...");
+
+// Flush all pending local changes to peers immediately
+await app.sync.flush();
+
+// List currently connected peers
+const peers = app.sync.getPeers();
+// [{ id: "did:key:...", latency: 42 }, ...]
+```
+
+**Sync events:**
+
+```typescript
+app.sync.on("sync:start",       ()     => console.log("Sync started"));
+app.sync.on("sync:complete",    (data) => console.log(`Done — ${data.peersReached} peers`));
+app.sync.on("sync:error",       (err)  => console.error(err.message));
+app.sync.on("peer:connected",   (peer) => console.log("Peer joined:", peer.id));
+app.sync.on("peer:disconnected",(peer) => console.log("Peer left:", peer.id));
+```
+
+- See the full [Force Sync API guide](./docs/FORCE_SYNC.md) for all methods, events,
+the React `useSyncStatus()` hook, and Python SDK usage.
+
+---
+
+### Auth API
+
+```typescript
+// Sign in — generates or loads an Ed25519 keypair (no password needed)
+const identity = await app.auth.signIn();
+console.log(identity.publicKey); // "did:key:z6Mk..."
+
+// Sign out
+await app.auth.signOut();
+
+// Get the current identity
+const current = app.auth.getIdentity();
+```
+
+---
+
+## Framework Integrations
 
 ### React
-```tsx
-import { ZerithProvider } from 'zerithdb-react';
 
-function Root() {
+```tsx
+import { ZerithProvider, useQuery } from "zerithdb-react";
+
+// 1. Wrap your app
+export default function App({ children }) {
   return (
-    <ZerithProvider config={{ appId: 'my-app' }}>
-      <App />
+    <ZerithProvider config={{ appId: "my-app", sync: true }}>
+      {children}
     </ZerithProvider>
+  );
+}
+
+// 2. Use hooks to read and write data
+function TodoList() {
+  const { data: todos, insert } = useQuery("todos");
+
+  return (
+    <div>
+      {todos.map((todo) => (
+        <p key={todo.id}>{todo.text}</p>
+      ))}
+      <button onClick={() => insert({ text: "New Todo" })}>Add</button>
+    </div>
   );
 }
 ```
 
-### Vanilla JS
+### Vanilla JavaScript
+
 ```javascript
-import { createApp } from 'zerithdb-sdk';
-const app = createApp({ appId: 'my-app' });
+import { createApp } from "zerithdb-sdk";
+
+const app = createApp({ appId: "my-app" });
+await app.db("notes").insert({ title: "First note" });
 ```
 
-### Python
-```python
-from zerithdb import ZerithClient
-db = ZerithClient(signaling_url="wss://signal.zerithdb.dev")
-await db.connect("my-app")
+### Python (Backend / ML Agent)
+
+See the [zerithdb-python](../zerithdb-python/README.md) package for connecting
+Python scripts and ML workloads to the same P2P mesh.
+
+---
+
+## Architecture
+
+```
+Your Browser
+├── ZerithDB SDK
+│   ├── CRDT Engine (Yjs)       — conflict-free data sync
+│   ├── IndexedDB Adapter       — local persistence
+│   ├── WebRTC Layer            — peer-to-peer data channels
+│   └── Signaling Client        — initial peer discovery (WebSocket)
+└── Auth Module (Ed25519)       — keypair identity, no passwords
 ```
 
-## 🏗️ Architecture Overview
+- **Local-first** — all reads and writes hit IndexedDB instantly (0ms latency).
+- **CRDT-powered** — data is represented as Yjs documents; merges are always conflict-free.
+- **WebRTC mesh** — peers connect directly via `simple-peer`; the signaling server
+  is only used for the initial handshake.
+- **Ed25519 identity** — every peer is identified by a cryptographic public key
+  generated entirely in-browser.
 
-ZerithDB follows a **thick-client, local-first architecture**. Unlike traditional web apps that treat the browser as a thin view into a central database, ZerithDB moves the database, synchronization logic, and networking directly into the client.
+---
 
-### Core Components
+## Troubleshooting
 
-- **CRDT Engine (Yjs)**: The heart of ZerithDB. Every collection is backed by a Yjs `Y.Doc`. This ensures that concurrent edits from multiple peers always converge to the same state without a central authority.
-- **IndexedDB (Dexie)**: Provides persistent, high-performance local storage. All writes are synchronous to IndexedDB first, ensuring 0ms latency and full offline capability.
-- **WebRTC Mesh**: Direct peer-to-peer data channels via `simple-peer`. Peers form a resilient mesh network to propagate CRDT updates with minimal latency.
-- **Signaling Service**: A lightweight WebSocket relay used *only* for initial peer discovery and the WebRTC handshake. Once connected, peers communicate directly.
+Having trouble? Check the resources below:
 
-### Data Flow
+- [Force Sync API guide](./docs/FORCE_SYNC.md) — manual sync, flush, and sync events
+- [zerithdb-python Troubleshooting](../zerithdb-python/TROUBLESHOOTING.md) — Python SDK
+  install errors (`aiortc`, `ffmpeg`)
+- [GitHub Issues](https://github.com/Zerith-Labs/ZerithDB/issues) — search or open a new issue
+- [Discord](https://discord.gg/MhvuDvzWfF) — community support
 
-```mermaid
-flowchart TD
-    User([User Action]) -->|Mutation| SDK[ZerithDB SDK]
-    SDK -->|Write| IDB[(IndexedDB)]
-    SDK -->|Update| CRDT[CRDT Engine]
-    CRDT -->|Delta| Net[P2P Network]
-    Net <-->|WebRTC| Peers[Connected Peers]
-    
-    Peers -->|Remote Delta| Net
-    Net -->|Apply| CRDT
-    CRDT -->|Reactive Update| IDB
-    IDB -->|Live Query| UI([Application UI])
+---
+
+## Contributing
+
+We welcome contributions! Please read
+[CONTRIBUTING.md](../../CONTRIBUTING.md) for the full workflow, coding guidelines
+and how to find good first issues.
+
+```bash
+git clone https://github.com/Zerith-Labs/ZerithDB.git
+cd ZerithDB
+pnpm install
+pnpm dev
 ```
 
-## ❓ Troubleshooting
+---
 
-Common issues and their solutions can be found in our [Troubleshooting Guide](https://zerithdb.netlify.app/docs/troubleshooting).
+## License
 
-### Common Scenarios
-- **Connection Fails**: Ensure your signaling URL is reachable. If you're behind a strict corporate firewall, you may need to configure custom [ICE servers](https://zerithdb.netlify.app/docs/troubleshooting#webrtc-nat-issue).
-- **Persistence Issues**: ZerithDB requires IndexedDB. Ensure your browser is not in a restricted "Private/Incognito" mode that disables storage.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on how to get started.
-
-## 📄 License
-
-Licensed under the [Apache License, Version 2.0](../../LICENSE).
+Apache 2.0 — see [LICENSE](../../LICENSE).

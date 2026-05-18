@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "zerithdb-core": ["packages/core/src/index.ts"],
+      "zerithdb-db": ["packages/db/src/index.ts"],
+      "zerithdb-sync": ["packages/sync/src/index.ts"],
+      "zerithdb-network": ["packages/network/src/index.ts"],
+      "zerithdb-auth": ["packages/auth/src/index.ts"]
+    }
+  },
+  "include": ["**/*.test.ts"]
+}

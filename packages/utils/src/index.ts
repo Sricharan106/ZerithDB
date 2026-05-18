@@ -6,7 +6,6 @@ import { ZerithDBError, ErrorCode } from "zerithdb-errors";
 
 // ─── Type guards ──────────────────────────────────────────────────────────────
 
-
 /**
  * Checks whether a value is a plain object.
  *
@@ -16,7 +15,6 @@ import { ZerithDBError, ErrorCode } from "zerithdb-errors";
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
-
 
 /**
  * Ensures that a value is neither null nor undefined.
@@ -32,7 +30,6 @@ export function assertDefined<T>(value: T | null | undefined, message: string): 
 }
 
 // ─── Encoding helpers ─────────────────────────────────────────────────────────
-
 
 /**
  * Converts a Uint8Array into a hexadecimal string.
@@ -143,3 +140,8 @@ export async function withTimeout<T>(
 export function randomId(): string {
   return crypto.randomUUID();
 }
+
+// ─── Fractional Indexing helpers ──────────────────────────────────────────────
+
+export { generateKeyBetween, rebalanceKeys } from "./fractional-indexing.js";
+

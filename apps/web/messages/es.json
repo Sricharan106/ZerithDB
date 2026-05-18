@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "docs": "Documentación",
+    "playground": "Área de Pruebas",
+    "github": "GitHub"
+  },
+  "header": {
+    "tagline": "Construye aplicaciones sin backend",
+    "title": "ZerithDB",
+    "subtitle": "Plataforma de base de datos nativa del navegador, local-first, peer-to-peer, impulsada por CRDT"
+  },
+  "hero": {
+    "title": "El navegador es el servidor",
+    "description": "Base de datos local-first, peer-to-peer e impulsada por CRDT. Construye aplicaciones full-stack SIN infraestructura de backend.",
+    "cta": "Comenzar",
+    "explore": "Explorar Documentación"
+  },
+  "features": {
+    "localFirst": {
+      "title": "Local-First",
+      "description": "Los datos viven en tu navegador. Funciona sin conexión. Se sincroniza cuando estás en línea."
+    },
+    "peerToPeer": {
+      "title": "Peer-to-Peer",
+      "description": "Sincronización directa de dispositivo a dispositivo sin servidores."
+    },
+    "crdt": {
+      "title": "Impulsado por CRDT",
+      "description": "Tipos de datos replicados sin conflictos para fusión automática."
+    },
+    "sync": {
+      "title": "Sincronización en Tiempo Real",
+      "description": "Los cambios se propagan instantáneamente a través de todos los pares conectados."
+    },
+    "secure": {
+      "title": "Cifrado de Extremo a Extremo",
+      "description": "Cifrado integrado para todos los datos en tránsito y en reposo."
+    },
+    "performance": {
+      "title": "Rápido como un Rayo",
+      "description": "Tiempos de respuesta en milisegundos con arquitectura local-first."
+    }
+  },
+  "docs": {
+    "title": "Documentación",
+    "gettingStarted": "Primeros Pasos",
+    "installation": "Instalación",
+    "quickStart": "Inicio Rápido",
+    "api": "Referencia de API",
+    "guides": "Guías",
+    "examples": "Ejemplos"
+  },
+  "footer": {
+    "copyright": "© 2024 ZerithDB. Todos los derechos reservados.",
+    "legal": "Aviso Legal",
+    "privacy": "Privacidad",
+    "terms": "Términos de Servicio"
+  },
+  "common": {
+    "learn": "Aprende Más",
+    "backHome": "Volver al inicio",
+    "save": "Guardar",
+    "tryNow": "Prueba Ahora",
+    "viewCode": "Ver Código",
+    "documentation": "Documentación",
+    "language": "Idioma"
+  }
+}

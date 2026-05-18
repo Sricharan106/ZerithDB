@@ -55,10 +55,10 @@ describe("isPlainObject()", () => {
     expect(isPlainObject(true)).toBe(false);
   });
 
-  it("returns false for a class instance", () => {
+  it("returns true for a class instance", () => {
     class Foo {}
-    // Class instances ARE plain objects structurally, but this tests the real-world
-    // use-case: isPlainObject is intended for JSON-safe records
+    // This utility currently uses a structural check, so class instances count as
+    // plain objects when they are objects that are not null or arrays.
     expect(isPlainObject(new Foo())).toBe(true); // typeof === 'object', not array, not null
   });
 

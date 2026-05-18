@@ -3,12 +3,14 @@
 The `createApp()` function is the primary entry point for initializing a ZerithDB application.
 
 It bootstraps the complete ZerithDB runtime, including:
+
 - local database access
 - CRDT synchronization
 - peer-to-peer networking
 - authentication and identity management
 
-The returned application instance exposes APIs for working with collections, synchronization, networking, and resource lifecycle management.
+The returned application instance exposes APIs for working with collections, synchronization,
+networking, and resource lifecycle management.
 
 ---
 
@@ -76,13 +78,13 @@ createApp(config: ZerithDBConfig): ZerithDBApp
 
 # Configuration Overview
 
-| Option | Description |
-|---|---|
-| `appId` | Unique identifier for the application |
-| `sync` | Synchronization engine configuration |
-| `auth` | Authentication and identity configuration |
-| `network` | Peer-to-peer networking configuration |
-| `logLevel` | SDK logging level |
+| Option     | Description                               |
+| ---------- | ----------------------------------------- |
+| `appId`    | Unique identifier for the application     |
+| `sync`     | Synchronization engine configuration      |
+| `auth`     | Authentication and identity configuration |
+| `network`  | Peer-to-peer networking configuration     |
+| `logLevel` | SDK logging level                         |
 
 ---
 
@@ -95,7 +97,7 @@ Applications using different IDs operate independently.
 ## Type
 
 ```typescript
-string
+string;
 ```
 
 ## Example
@@ -113,6 +115,7 @@ createApp({
 Configuration for the CRDT synchronization engine.
 
 The sync engine manages:
+
 - Yjs document synchronization
 - peer-to-peer update propagation
 - signaling coordination
@@ -135,7 +138,7 @@ Defines the WebSocket signaling server used for WebRTC peer discovery.
 ### Default
 
 ```typescript
-"wss://signal.zerithdb.dev"
+"wss://signal.zerithdb.dev";
 ```
 
 ### Example
@@ -157,7 +160,7 @@ Maximum number of peer connections allowed simultaneously.
 ### Default
 
 ```typescript
-10
+10;
 ```
 
 ### Example
@@ -177,6 +180,7 @@ createApp({
 Authentication and identity management configuration.
 
 The authentication manager handles:
+
 - local identity persistence
 - keypair generation
 - message signing
@@ -198,7 +202,7 @@ Defines the storage key used to persist local identity information.
 ### Default
 
 ```typescript
-"__zerithdb_identity"
+"__zerithdb_identity";
 ```
 
 ### Example
@@ -218,6 +222,7 @@ createApp({
 Peer-to-peer networking configuration.
 
 The network manager is responsible for:
+
 - WebRTC peer connections
 - reconnect handling
 - signaling communication
@@ -240,7 +245,7 @@ Automatically reconnects peers when a connection is lost.
 ### Default
 
 ```typescript
-true
+true;
 ```
 
 ### Example
@@ -262,7 +267,7 @@ Delay before attempting reconnection.
 ### Default
 
 ```typescript
-1000
+1000;
 ```
 
 ### Example
@@ -352,6 +357,7 @@ app.sync.enable();
 ```
 
 The sync engine manages:
+
 - Yjs document synchronization
 - peer discovery
 - update propagation
@@ -369,6 +375,7 @@ const auth = app.auth;
 ```
 
 Authentication features include:
+
 - identity persistence
 - cryptographic signing
 - peer identity verification
@@ -386,6 +393,7 @@ const network = app.network;
 ```
 
 The network manager handles:
+
 - WebRTC signaling
 - peer connections
 - reconnection behavior
@@ -395,6 +403,7 @@ The network manager handles:
 # Resource Cleanup
 
 Applications should call `dispose()` before shutdown to release:
+
 - active peer connections
 - synchronization resources
 - database handles
@@ -444,6 +453,7 @@ For unstable mobile or public networks, increase reconnect delay values to reduc
 ## Secure Signaling Infrastructure
 
 Production deployments should:
+
 - use secure WebSocket connections (`wss://`)
 - deploy trusted signaling servers
 - monitor peer connection activity
@@ -498,11 +508,13 @@ const app = createApp({
 
 # Summary
 
-`createApp()` initializes the complete ZerithDB environment and acts as the central coordination layer for:
+`createApp()` initializes the complete ZerithDB environment and acts as the central coordination
+layer for:
 
 - local database collections
 - CRDT synchronization
 - authentication
 - peer-to-peer networking
 
-It is the recommended entry point for building collaborative and offline-first applications with ZerithDB.
+It is the recommended entry point for building collaborative and offline-first applications with
+ZerithDB.

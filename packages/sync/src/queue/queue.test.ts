@@ -2,13 +2,15 @@ import { describe, it, expect } from "vitest";
 import "fake-indexeddb/auto";
 import { OutboxQueue } from "./OutboxQueue.js";
 import { InboxQueue } from "./InboxQueue.js";
+import { createQueueStorage } from "./queue-db.js";
 
 const createAppId = () => `test-queue-${Math.random().toString(36).slice(2)}`;
 
 describe("OutboxQueue", () => {
   it("enqueue should persist and count pending", async () => {
     const appId = createAppId();
-    const queue = new OutboxQueue<Uint8Array>(appId);
+    const storage = createQueueStorage<Uint8Array>(appId, "_zerith_outbox");
+    const queue = new OutboxQueue<Uint8Array>(storage);
 
     await queue.enqueue({
       type: "sync-update",
@@ -25,7 +27,8 @@ describe("OutboxQueue", () => {
 
   it("acknowledge should remove from pending", async () => {
     const appId = createAppId();
-    const queue = new OutboxQueue<Uint8Array>(appId);
+    const storage = createQueueStorage<Uint8Array>(appId, "_zerith_outbox");
+    const queue = new OutboxQueue<Uint8Array>(storage);
 
     const mutation = await queue.enqueue({
       type: "sync-update",
@@ -42,7 +45,8 @@ describe("OutboxQueue", () => {
 
   it("markFailed should increment retries and clear pending", async () => {
     const appId = createAppId();
-    const queue = new OutboxQueue<string>(appId);
+    const storage = createQueueStorage<string>(appId, "_zerith_outbox");
+    const queue = new OutboxQueue<string>(storage);
 
     const mutation = await queue.enqueue({
       type: "sync-update",
@@ -59,7 +63,8 @@ describe("OutboxQueue", () => {
 
   it("should persist across instances", async () => {
     const appId = createAppId();
-    const queueA = new OutboxQueue<number>(appId);
+    const storageA = createQueueStorage<number>(appId, "_zerith_outbox");
+    const queueA = new OutboxQueue<number>(storageA);
 
     await queueA.enqueue({
       type: "sync-update",
@@ -67,7 +72,8 @@ describe("OutboxQueue", () => {
       payload: 42,
     });
 
-    const queueB = new OutboxQueue<number>(appId);
+    const storageB = createQueueStorage<number>(appId, "_zerith_outbox");
+    const queueB = new OutboxQueue<number>(storageB);
     const pending = await queueB.getPending();
 
     expect(pending).toHaveLength(1);
@@ -78,7 +84,8 @@ describe("OutboxQueue", () => {
 describe("InboxQueue", () => {
   it("enqueue should persist and count pending", async () => {
     const appId = createAppId();
-    const queue = new InboxQueue<Uint8Array>(appId);
+    const storage = createQueueStorage<Uint8Array>(appId, "_zerith_inbox");
+    const queue = new InboxQueue<Uint8Array>(storage);
 
     await queue.enqueue({
       type: "sync-update",
@@ -94,7 +101,8 @@ describe("InboxQueue", () => {
 
   it("acknowledge should remove from pending", async () => {
     const appId = createAppId();
-    const queue = new InboxQueue<Uint8Array>(appId);
+    const storage = createQueueStorage<Uint8Array>(appId, "_zerith_inbox");
+    const queue = new InboxQueue<Uint8Array>(storage);
 
     const mutation = await queue.enqueue({
       type: "sync-update",
@@ -111,7 +119,8 @@ describe("InboxQueue", () => {
 
   it("markFailed should increment retries and clear pending", async () => {
     const appId = createAppId();
-    const queue = new InboxQueue<string>(appId);
+    const storage = createQueueStorage<string>(appId, "_zerith_inbox");
+    const queue = new InboxQueue<string>(storage);
 
     const mutation = await queue.enqueue({
       type: "sync-update",
@@ -128,7 +137,8 @@ describe("InboxQueue", () => {
 
   it("should persist across instances", async () => {
     const appId = createAppId();
-    const queueA = new InboxQueue<number>(appId);
+    const storageA = createQueueStorage<number>(appId, "_zerith_inbox");
+    const queueA = new InboxQueue<number>(storageA);
 
     await queueA.enqueue({
       type: "sync-update",
@@ -136,7 +146,8 @@ describe("InboxQueue", () => {
       payload: 7,
     });
 
-    const queueB = new InboxQueue<number>(appId);
+    const storageB = createQueueStorage<number>(appId, "_zerith_inbox");
+    const queueB = new InboxQueue<number>(storageB);
     const pending = await queueB.getPending();
 
     expect(pending).toHaveLength(1);
