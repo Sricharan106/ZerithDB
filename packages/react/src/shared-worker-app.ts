@@ -14,7 +14,7 @@ import type {
   QueryFilter,
   Document,
 } from "./shared-worker-protocol.js";
-import { makeRequestId, serializeError } from "./shared-worker-protocol.js";
+import { makeRequestId } from "./shared-worker-protocol.js";
 import type { ZerithDBApp } from "zerithdb-sdk";
 
 type RequestResolver = {
@@ -85,6 +85,7 @@ class SharedWorkerBridge {
   }
 
   get sync(): SharedWorkerApp["sync"] {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const bridge = this;
     return {
       enable: () => {
@@ -100,6 +101,7 @@ class SharedWorkerBridge {
   }
 
   get auth(): SharedWorkerApp["auth"] {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const bridge = this;
     return {
       signIn: () => bridge.requestApp("auth", "signIn", []) as Promise<Identity>,
@@ -118,6 +120,7 @@ class SharedWorkerBridge {
   }
 
   get network(): SharedWorkerApp["network"] {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const bridge = this;
     return {
       connect: (roomId: string) =>

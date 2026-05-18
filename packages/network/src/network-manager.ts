@@ -5,14 +5,16 @@ import type {
   PeerInfo,
   MediaStreamKind,
   MediaStreamMetadata,
+  IncomingPeerDataMessage,
+  PeerDataMessage,
 } from "zerithdb-core";
-import { EventEmitter, ZerithDBError, ErrorCode } from "zerithdb-core";
+import { EventEmitter, ZerithDBError, ErrorCode, PeerDataMessageSchema } from "zerithdb-core";
 import type { AuthManager } from "zerithdb-auth";
 import type { SignalingTransport } from "./signaling-transport.js";
 import { WebSocketTransport } from "./transports/websocket-transport.js";
 import { PollingTransport } from "./transports/polling-transport.js";
 import { NameRegistry } from "./name-registry.js";
-import { MockENSResolver } from "./ens-resolver";
+import { MockENSResolver } from "./ens-resolver.js";
 
 export interface WebRtcBufferStats {
   peerCount: number;
@@ -29,13 +31,14 @@ interface SimplePeerWithChannel {
 type NetworkEvents = {
   "peer:connected": PeerInfo;
   "peer:disconnected": { peerId: PeerId };
-  message: { type: string; payload: Uint8Array | string; from: PeerId };
+  message: IncomingPeerDataMessage;
   "media:stream": { peerId: PeerId; stream: MediaStream; metadata?: MediaStreamMetadata };
   "media:track": { peerId: PeerId; track: MediaStreamTrack; stream: MediaStream };
   "media:stream:metadata": { peerId: PeerId; metadata: MediaStreamMetadata };
   "media:stream:removed": { peerId: PeerId; streamId: string };
   error: { peerId: PeerId; error: Error };
   "transport:downgrade": { from: "websocket"; to: "polling"; reason: string };
+  announcement: string;
 };
 
 export type MediaStreamMetadataInput = Partial<
@@ -46,7 +49,7 @@ export type MediaStreamMetadataInput = Partial<
 > & { kind?: MediaStreamKind };
 
 interface SignalingMessage {
-  type: "offer" | "answer" | "ice-candidate" | "peer-list";
+  type: "offer" | "answer" | "ice-candidate" | "peer-list" | "announcement";
   from: string;
   to?: string;
   payload: unknown;
@@ -194,58 +197,24 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
   /**
    * Broadcast a message to all connected peers.
    */
-  broadcast(message: { type: string; payload: string | Uint8Array }): void {
-    this.signAndSendAsync(message, null);
+  broadcast(message: PeerDataMessage): void {
+    const parsed = PeerDataMessageSchema.parse(message);
+    const data = JSON.stringify(parsed);
+    for (const [, peer] of this.peers) {
+      if (peer.connected) {
+        peer.send(data);
+      }
+    }
   }
 
   /**
    * Send a message to a specific peer.
    */
-  sendTo(peerId: PeerId, message: { type: string; payload: string | Uint8Array }): void {
-    this.signAndSendAsync(message, peerId);
-  }
-
-  private async signAndSendAsync(
-    message: { type: string; payload: string | Uint8Array },
-    targetPeerId: PeerId | null
-  ): Promise<void> {
-    try {
-      let finalMessage = { ...message } as any;
-
-      if (this.auth?.biometric?.isBiometricEnabled()) {
-        const payloadBytes =
-          typeof message.payload === "string"
-            ? new TextEncoder().encode(message.payload)
-            : message.payload;
-
-        const sigBytes = await this.auth.biometric.sign(payloadBytes);
-        const signature = bytesToHex(sigBytes);
-        const senderPublicKey = await this.auth.biometric.getPublicKeyHex();
-
-        finalMessage = {
-          type: message.type,
-          payload: message.payload,
-          signature,
-          senderPublicKey,
-        };
-      }
-
-      const data = JSON.stringify(finalMessage);
-
-      if (targetPeerId === null) {
-        for (const [, peer] of this.peers) {
-          if (peer.connected) {
-            peer.send(data);
-          }
-        }
-      } else {
-        const peer = this.peers.get(targetPeerId);
-        if (peer?.connected) {
-          peer.send(data);
-        }
-      }
-    } catch (err) {
-      console.error("[ZerithDB] Failed to sign/send WebRTC message:", err);
+  sendTo(peerId: PeerId, message: PeerDataMessage): void {
+    const parsed = PeerDataMessageSchema.parse(message);
+    const peer = this.peers.get(peerId);
+    if (peer?.connected) {
+      peer.send(JSON.stringify(parsed));
     }
   }
 
@@ -311,10 +280,17 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
   // ─── Private — Transport setup ────────────────────────────────────────────
 
   private async connectWebSocket(signalingUrl: string, roomId: string): Promise<void> {
-    const url = `${signalingUrl}?room=${encodeURIComponent(roomId)}&peer=${this.localPeerId}`;
+    const proofOfWork = await this.createProofOfWork(signalingUrl, roomId);
+    const url = new URL(signalingUrl);
+    url.searchParams.set("room", roomId);
+    url.searchParams.set("peer", this.localPeerId);
+    if (proofOfWork !== null) {
+      url.searchParams.set("powChallenge", proofOfWork.challenge);
+      url.searchParams.set("powNonce", proofOfWork.nonce);
+    }
 
     const wsTransport = new WebSocketTransport();
-    await wsTransport.connect(url, 5000);
+    await wsTransport.connect(url.toString(), 5000);
 
     this.attachTransport(wsTransport, roomId);
     this.activeTransportType = "websocket";
@@ -323,9 +299,10 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
 
   private async connectPolling(signalingUrl: string, roomId: string): Promise<void> {
     const httpUrl = this.wsUrlToHttp(signalingUrl);
+    const proofOfWork = await this.createProofOfWork(signalingUrl, roomId);
 
     const pollTransport = new PollingTransport(httpUrl);
-    await pollTransport.connect(roomId, this.localPeerId);
+    await pollTransport.connect(roomId, this.localPeerId, proofOfWork);
 
     this.attachTransport(pollTransport, roomId);
     this.activeTransportType = "polling";
@@ -371,6 +348,14 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
 
   // ─── Private — Signaling message handling ─────────────────────────────
 
+  private async createProofOfWork(signalingUrl: string, roomId: string) {
+    return fetchSignalingProofOfWork({
+      baseUrl: this.wsUrlToHttp(signalingUrl),
+      roomId,
+      peerId: this.localPeerId,
+    });
+  }
+
   private async handleSignalingMessage(msg: SignalingMessage): Promise<void> {
     // ─── Identity enrichment (Phase 1) ───
     // Attach human-readable name if provided during signaling
@@ -393,6 +378,11 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     }
 
     switch (msg.type) {
+      case "announcement":
+        console.warn(`[ZerithDB] System Announcement: ${msg.payload}`);
+        this.emit("announcement", msg.payload as string);
+        break;
+
       case "peer-list":
         for (const peerId of msg.payload as PeerId[]) {
           if (peerId !== this.localPeerId) {
@@ -515,7 +505,25 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     });
 
     peer.on("data", (data: Uint8Array | string) => {
-      this.handleInboundDataAsync(remotePeerId, data);
+      try {
+        const raw = JSON.parse(typeof data === "string" ? data : new TextDecoder().decode(data));
+
+        const parsed = PeerDataMessageSchema.safeParse(raw);
+
+        if (!parsed.success) {
+          return;
+        }
+
+        const msg = {
+          ...parsed.data,
+          from: remotePeerId,
+        };
+
+        this.handlePeerMessage(remotePeerId, parsed.data);
+        this.emit("message", msg);
+      } catch {
+        // Ignore malformed messages
+      }
     });
 
     peer.on("stream", (stream: MediaStream) => {
@@ -671,10 +679,7 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     return result;
   }
 
-  private handlePeerMessage(
-    remotePeerId: PeerId,
-    msg: { type: string; payload: string | Uint8Array }
-  ): void {
+  private handlePeerMessage(remotePeerId: PeerId, msg: PeerDataMessage): void {
     if (msg.type === "media-stream-metadata" && typeof msg.payload === "string") {
       const metadata = JSON.parse(msg.payload) as MediaStreamMetadata;
       let peerMetadata = this.remoteStreamMetadata.get(remotePeerId);

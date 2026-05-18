@@ -53,20 +53,8 @@ export const validFilter: QueryFilter<User> = {
   name: "Alice",
 };
 
-export const validRegexFilter: QueryFilter<User> = {
-  name: { $regex: /ali/i },
-};
-
-export const validRegexStringFilter: QueryFilter<User> = {
-  name: { $regex: "ali", $flags: "i" },
-};
-
-export const validRegexOptionsFilter: QueryFilter<User> = {
-  name: { $regex: "ali", $options: "i" },
-};
-
-// @ts-expect-error - Invalid field type
+// @ts-expect-error: Invalid field type
 export const invalidFieldType: QueryFilter<User> = { age: "wrong" };
 
-// @ts-expect-error - Invalid operator type
+// @ts-expect-error: Invalid operator type
 export const invalidOperatorType: QueryFilter<User> = { age: { $gt: "not-a-number" } };

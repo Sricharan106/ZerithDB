@@ -38,7 +38,7 @@ The goal of this phase is to establish a working, testable monorepo with core fu
 | `zerithdb-db` — IndexedDB via Dexie        | 🚧     | Basic CRUD done, live queries WIP |
 | `zerithdb-sync` — Yjs integration          | 🚧     | Local sync working, network WIP   |
 | `zerithdb-network` — WebRTC + signaling    | 🚧     | 2-peer tested, mesh topology WIP  |
-| `zerithdb-auth` — Ed25519 keypair identity | 📋     |                                   |
+| `zerithdb-auth` — Ed25519 keypair identity | 🚧     |                                   |
 | `zerithdb-sdk` — createApp() API           | 🚧     | Basic composition working         |
 | `zerithdb-cli` — `zerithdb init`           | 📋     |                                   |
 | Signaling server                           | ✅     | Basic WebSocket relay             |

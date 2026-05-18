@@ -1,14 +1,15 @@
 import { Logger } from "zerithdb-core";
-import type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig } from "zerithdb-core";
-export type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig };
+import type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig, InsertResult, PeerInfo, UpdateSpec } from "zerithdb-core";
+export type { Document, Identity, QueryFilter, SyncState, ZerithDBConfig, InsertResult, PeerInfo, UpdateSpec };
 import { MemoryCollector, estimateStorageBytes } from "zerithdb-devtools";
 import { ZerithDBError, ErrorCode } from "zerithdb-core";
-import { DbClient, CollectionClient } from "zerithdb-db";
-import type { CloudBackupTarget, LocalCloudBackupOptions } from "zerithdb-db";
-import { LocalCloudBackupAdapter } from "zerithdb-db";
-import { SyncEngine } from "zerithdb-sync";
-import { AuthManager } from "zerithdb-auth";
-import { NetworkManager } from "zerithdb-network";
+import { DbClient, CollectionClient } from "./db-client.js";
+import type { CloudBackupTarget, LocalCloudBackupOptions } from "./db-client.js";
+import { LocalCloudBackupAdapter } from "./db-client.js";
+import { SyncEngine } from "./sync-engine.js";
+import { AuthManager } from "./auth-manager.js";
+import { NetworkManager } from "./network-manager.js";
+import { LLMConflictResolver } from "./conflict-resolution/resolver.js";
 
 /**
  * The root ZerithDB application instance returned by {@link createApp}.
@@ -29,6 +30,7 @@ export interface ZerithDBApp {
    * ```
    */
   db<T extends Record<string, any> = Record<string, any>>(name: string): CollectionClient<T>;
+  dbClient: DbClient;
 
   /** CRDT sync engine — manages Yjs documents and P2P update propagation */
   sync: SyncEngine;
@@ -128,7 +130,40 @@ export function createApp(config: ZerithDBConfig): ZerithDBApp {
   const auth = new AuthManager(resolvedConfig);
   const db = new DbClient(resolvedConfig, auth);
   const network = new NetworkManager(resolvedConfig, auth);
-  const sync = new SyncEngine(resolvedConfig, db, network);
+  let syncInstance: SyncEngine | null = null;
+
+  const getSync = () => {
+    if (!syncInstance) {
+      syncInstance = new SyncEngine(resolvedConfig, db, network, auth);
+    }
+
+    return syncInstance;
+  };
+
+  if (resolvedConfig.conflictResolver?.enabled === true) {
+    const resolver = new LLMConflictResolver({
+      modelName: resolvedConfig.conflictResolver.modelName,
+      autoApplyThreshold: resolvedConfig.conflictResolver.autoApplyThreshold,
+    });
+
+    sync.registerPlugin({
+      id: resolver.id,
+      version: resolver.version,
+      conflictResolver: resolver,
+    });
+
+    if (resolvedConfig.conflictResolver.onConflict) {
+      const onConflict = resolvedConfig.conflictResolver.onConflict;
+      sync.on("conflict:flagged", (event) => {
+        const suggestion =
+          typeof event === "object" && event !== null && "suggestion" in event &&
+          typeof event.suggestion === "string"
+            ? event.suggestion
+            : "Conflict flagged for review";
+        onConflict(event.collectionName, suggestion);
+      });
+    }
+  }
 
   let memoryCollector: MemoryCollector | null = null;
   if (resolvedConfig.debug?.devtools === true) {
@@ -160,6 +195,8 @@ export function createApp(config: ZerithDBConfig): ZerithDBApp {
       return db.collection<T>(name);
     },
 
+    dbClient: db,
+
     sync,
     auth,
     network,
@@ -174,7 +211,11 @@ export function createApp(config: ZerithDBConfig): ZerithDBApp {
       memoryCollector?.stop();
       await Promise.all(Array.from(backupAdapters).map((a) => a.stop()));
       backupAdapters.clear();
-      await Promise.all([sync.dispose(), network.dispose(), db.dispose()]);
+      if (syncInstance) {
+        await syncInstance.dispose();
+      }
+
+      await Promise.all([network.dispose(), db.dispose()]);
     },
   };
 }

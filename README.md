@@ -126,25 +126,15 @@ That's it. No `.env` files. No `docker-compose.yml`. No cloud accounts.
 
 ## Quick Start
 
-### Option 1: CLI (Recommended)
+### Installation
 
-If you're new here, follow these beginner friendly steps to get ZerithDB running on your machine:
-
-| Step | Action              | Command                           | What it does                            |
-| ---- | ------------------- | --------------------------------- | --------------------------------------- |
-| 1    | **Initialize**      | `npx zerithdb@latest init my-app` | Creates your project folder.            |
-| 2    | **Go to Directory** | `cd my-app`                       | Enters the folder you just created.     |
-| 3    | **Install**         | `npm install`                     | Gets all the tools needed for the app.  |
-| 4    | **Start App**       | `npm run dev`                     | Launches the app in your local browser. |
-
-> **Note:** You need [Node.js](https://nodejs.org/) installed to run these commands!
-
-### Option 2: Manual Install
+> **Note:** ZerithDB is currently in alpha and packages are not yet published to NPM. To use it, please clone the repository!
 
 ```bash
-pnpm add zerithdb-sdk
-# or
-npm install zerithdb-sdk
+git clone https://github.com/Zerith-Labs/ZerithDB.git
+cd ZerithDB
+pnpm install
+pnpm dev
 ```
 
 ### Minimal Setup

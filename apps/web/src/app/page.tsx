@@ -22,15 +22,21 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 
 const CodeWalkthrough = dynamic(() => import("@/components/CodeWalkthrough"), {
-  loading: () => <div className="h-96 animate-pulse rounded-xl bg-gray-100" />,
+  loading: () => (
+    <div className="h-96 animate-pulse rounded-xl bg-gray-100 dark:bg-zinc-800 transition-colors duration-300" />
+  ),
 });
 
 const TerminalShowcase = dynamic(() => import("@/components/TerminalShowcase"), {
-  loading: () => <div className="h-96 animate-pulse rounded-xl bg-gray-100" />,
+  loading: () => (
+    <div className="h-96 animate-pulse rounded-xl bg-gray-100 dark:bg-zinc-800 transition-colors duration-300" />
+  ),
 });
 
 const AnimatedDiagram = dynamic(() => import("@/components/AnimatedDiagram"), {
-  loading: () => <div className="h-96 animate-pulse rounded-xl bg-gray-100" />,
+  loading: () => (
+    <div className="h-96 animate-pulse rounded-xl bg-gray-100 dark:bg-zinc-800 transition-colors duration-300" />
+  ),
 });
 import FrameworkSection from "@/components/FrameworkSection";
 import { useState, useEffect } from "react";
@@ -83,10 +89,10 @@ export default function LandingPage() {
   };
 
   return (
-    <main className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+    <main className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 selection:bg-blue-100 selection:text-blue-900 ">
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-50 bg-background/80 supports-[backdrop-filter]:bg-background/60 border-b border-border backdrop-blur-md">
+        <div className="container mx-auto flex items-center justify-between px-4 md:px-8 py-3 gap-3">
           <div className="flex items-center gap-2">
             <motion.div
               initial={{ rotate: -10, scale: 0.9 }}
@@ -104,16 +110,16 @@ export default function LandingPage() {
             <span className="font-semibold text-xl tracking-tight">ZerithDB</span>
           </div>
           <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-sm font-medium text-muted-foreground">
-            <Link href="/docs" className="hover:text-foreground transition-colors font-medium">
+            <Link href="/docs" className="hover:text-black dark:hover:text-white transition-colors font-medium">
               Docs
             </Link>
-            <Link href="#features" className="hover:text-foreground transition-colors">
+            <Link href="/docs" className="hover:text-black dark:hover:text-white transition-colors font-medium">
               Features
             </Link>
-            <Link href="#how-it-works" className="hover:text-foreground transition-colors">
+            <Link href="/docs" className="hover:text-black dark:hover:text-white transition-colors font-medium">
               How it works
             </Link>
-            <Link href="#compare" className="hover:text-foreground transition-colors">
+            <Link href="/docs" className="hover:text-black dark:hover:text-white transition-colors font-medium">
               Compare
             </Link>
             <Link
@@ -121,6 +127,12 @@ export default function LandingPage() {
               className="text-blue-600 font-semibold hover:text-blue-700 transition-colors flex items-center gap-1.5"
             >
               <Zap className="w-4 h-4" /> Playground
+            </Link>
+            <Link
+              href="/dev"
+              className="text-slate-900 font-semibold hover:text-black transition-colors flex items-center gap-1.5"
+            >
+              <Terminal className="w-4 h-4" /> Dev
             </Link>
           </nav>
           <div className="flex items-center gap-2 sm:gap-4">
@@ -150,7 +162,7 @@ export default function LandingPage() {
             </a>
             <Link
               href="#get-started"
-              className="hidden sm:flex bg-black text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap"
+              className="hidden sm:flex bg-black dark:bg-white text-white dark:text-black text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
               Get Started
             </Link>
@@ -252,7 +264,7 @@ export default function LandingPage() {
               opacity: [0.3, 0.4, 0.3],
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-blue-100/50 rounded-full blur-[100px]"
+            className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-[100px] transition-colors duration-300"
           />
           <motion.div
             animate={{
@@ -260,11 +272,11 @@ export default function LandingPage() {
               opacity: [0.2, 0.3, 0.2],
             }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-20 right-1/4 w-[600px] h-[600px] bg-indigo-100/40 rounded-full blur-[120px]"
+            className="absolute top-20 right-1/4 w-[600px] h-[600px] bg-indigo-100/40 dark:bg-indigo-900/20 rounded-full blur-[120px] transition-colors duration-300"
           />
 
           {/* Central Glow behind text */}
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-blue-50/30 rounded-full blur-[80px]" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-blue-50/30 dark:bg-blue-900/10 rounded-full blur-[80px] transition-colors duration-300" />
 
           {/* Structured Decorative Elements - Moved closer for framing */}
           {/* Left Abstract Shape - More animated & fluid */}
@@ -281,7 +293,7 @@ export default function LandingPage() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute top-[10%] left-[5%] w-40 h-40 bg-white/20 border border-blue-200/40 backdrop-blur-[12px] hidden xl:block shadow-[0_20px_50px_rgba(59,130,246,0.15)]"
+            className="absolute top-[10%] left-[5%] w-40 h-40 bg-white/20 dark:bg-white/5 border border-blue-200/40 backdrop-blur-[12px] hidden xl:block shadow-[0_20px_50px_rgba(59,130,246,0.15)] transition-colors duration-300"
           />
 
           {/* Right Abstract Shape - Reduced size and softened shadow */}
@@ -299,7 +311,7 @@ export default function LandingPage() {
               ease: "easeInOut",
               delay: 1,
             }}
-            className="absolute top-[38%] right-[5%] w-52 h-52 bg-white/10 border border-indigo-200/40 backdrop-blur-[6px] hidden xl:block shadow-[0_8px_30px_rgba(99,102,241,0.06)]"
+            className="absolute top-[38%] right-[5%] w-52 h-52 bg-white/10 dark:bg-white/[0.03] border border-indigo-200/40 backdrop-blur-[6px] hidden xl:block shadow-[0_8px_30px_rgba(99,102,241,0.06)] transition-colors duration-300"
           />
         </div>
 
@@ -318,51 +330,93 @@ export default function LandingPage() {
             The browser is the server. Local-first, peer-to-peer, CRDT-powered database platform.
             Replace your backend, database, and auth system entirely.
           </p>
-        </motion.div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              {[
+                "⚡ Local-first",
+                "🔄 CRDT Sync",
+                "🌐 Peer-to-Peer",
+                "🔒 Offline Privacy",
+              ].map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full border border-border bg-background/70 px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur transition-colors duration-300"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link
+              href="#get-started"
+              className="group flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-medium text-base hover:bg-gray-800 transition-all shadow-sm w-full sm:w-auto justify-center"
+            >
+              Start Building
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="#playground"
+              className="flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 px-6 py-3.5 rounded-xl font-medium text-base hover:bg-blue-100 transition-all w-full sm:w-auto justify-center shadow-sm"
+            >
+              <Zap className="w-4 h-4 animate-pulse" />
+              Try Playground
+            </Link>
+            <a
+              href="https://github.com/Zerith-Labs/ZerithDB"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-background text-foreground border border-border px-6 py-3.5 rounded-xl font-medium text-base hover:bg-muted transition-all transition-colors duration-300 w-full sm:w-auto justify-center shadow-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-5 h-5"
+              >
+                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                <path d="M9 18c-4.51 2-5-2-7-2" />
+              </svg>
+              GitHub
+            </a>
+          </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="mt-8 flex flex-col items-center gap-4"
         >
-          <Link
-            href="#get-started"
-            className="group flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-medium text-base hover:bg-gray-800 transition-all shadow-sm w-full sm:w-auto justify-center"
-          >
-            Start Building
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="#playground"
-            className="flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 px-6 py-3.5 rounded-xl font-medium text-base hover:bg-blue-100 transition-all w-full sm:w-auto justify-center shadow-sm"
-          >
-            <Zap className="w-4 h-4 animate-pulse" />
-            Try Playground
-          </Link>
-          <a
-            href="https://github.com/Zerith-Labs/ZerithDB"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-background text-foreground border border-border px-6 py-3.5 rounded-xl font-medium text-base hover:bg-muted transition-all transition-colors duration-300 w-full sm:w-auto justify-center shadow-sm"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-5 h-5"
+          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Get started in 30 seconds
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 rounded-2xl border border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur transition-colors duration-300">
+            <code className="text-sm sm:text-base font-mono text-foreground">
+              npm install zerithdb-sdk
+            </code>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText("npm install zerithdb-sdk");
+                toast.success("Copied install command");
+              }}
+              className="rounded-lg border border-border px-3 py-1 text-sm font-medium hover:bg-muted transition-colors"
             >
-              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-              <path d="M9 18c-4.51 2-5-2-7-2" />
-            </svg>
-            GitHub
-          </a>
+              Copy
+            </button>
+          </div>
         </motion.div>
 
         {/* ── FRAMEWORKS ── */}
@@ -391,31 +445,22 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="container mx-auto px-6 flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale"
+          className="container mx-auto px-6 flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale"
         >
           <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
             <Terminal className="w-5 h-5" /> Open Source
           </div>
           <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-5 h-5"
-            >
-              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-              <path d="M9 18c-4.51 2-5-2-7-2" />
-            </svg>{" "}
-            Built for Developers
+            <Network className="w-5 h-5" /> WebRTC
           </div>
           <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
-            <Zap className="w-5 h-5" /> Zero Latency
+            <Database className="w-5 h-5" /> IndexedDB
+          </div>
+          <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
+            <Zap className="w-5 h-5" /> Yjs Powered
+          </div>
+          <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
+            <CheckCircle className="w-5 h-5" /> Offline-first
           </div>
         </motion.div>
       </section>
@@ -642,7 +687,7 @@ export default function LandingPage() {
                 <div className="flex justify-between text-sm font-medium mb-2">
                   <span className="text-foreground font-bold flex items-center gap-2">
                     ZerithDB (Local-first){" "}
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                    <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 rounded text-xs transition-colors duration-300">
                       Fastest
                     </span>
                   </span>
@@ -687,7 +732,7 @@ export default function LandingPage() {
                   <th className="py-4 px-6 font-semibold w-1/4">Feature</th>
                   <th className="py-4 px-6 font-semibold w-1/4">Firebase</th>
                   <th className="py-4 px-6 font-semibold w-1/4">Supabase</th>
-                  <th className="py-4 px-6 font-bold text-blue-600 bg-blue-50/50 w-1/4">
+                  <th className="py-4 px-6 font-bold text-blue-600 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-950/20 w-1/4 transition-colors duration-300">
                     ZerithDB
                   </th>
                 </tr>
@@ -817,7 +862,7 @@ export default function LandingPage() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute top-12 left-[12%] w-36 h-36 bg-white/15 border border-blue-200/30 backdrop-blur-[10px] hidden md:block shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
+            className="absolute top-12 left-[12%] w-36 h-36 bg-white/15 dark:bg-white/5 border border-blue-200/30 backdrop-blur-[10px] hidden md:block shadow-[0_15px_35px_rgba(0,0,0,0.08)] transition-colors duration-300"
           />
           <motion.div
             animate={{
@@ -832,7 +877,7 @@ export default function LandingPage() {
               ease: "easeInOut",
               delay: 1,
             }}
-            className="absolute bottom-12 right-[15%] w-48 h-48 bg-white/5 border border-gray-200/40 backdrop-blur-[5px] hidden md:block shadow-[0_10px_30px_rgba(0,0,0,0.03)]"
+            className="absolute bottom-12 right-[15%] w-48 h-48 bg-white/5 dark:bg-white/[0.03] border border-gray-200/40 backdrop-blur-[5px] hidden md:block shadow-[0_10px_30px_rgba(0,0,0,0.03)] transition-colors duration-300"
           />
         </div>
 
@@ -856,7 +901,7 @@ export default function LandingPage() {
               href="https://github.com/Zerith-Labs/ZerithDB"
               className="bg-black text-white px-8 py-4 rounded-xl font-medium text-base hover:bg-gray-800 transition-all shadow-lg w-full sm:w-auto"
             >
-              npm install zerithdb-sdk
+              git clone Zerith-Labs/ZerithDB
             </motion.a>
             <motion.a
               whileHover={{ scale: 1.05 }}
@@ -910,27 +955,11 @@ export default function LandingPage() {
             >
               GitHub
             </a>
-
-            <Link
-              href="/"
-              onClick={() => toast("Blog will be available soon")}
-              className="hover:text-foreground transition-colors cursor-pointer"
-            >
-              Blog
-            </Link>
-
-            <Link
-              href="/"
-              onClick={() => toast("Pricing will be available soon")}
-              className="hover:text-foreground transition-colors cursor-pointer"
-            >
-              Pricing
-            </Link>
             <a
               href="https://discord.gg/MhvuDvzWfF"
               target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
+              rel="noreferrer"
+              className="hover:text-gray-900 transition-colors"
             >
               Discord
             </a>
@@ -948,7 +977,7 @@ export default function LandingPage() {
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ duration: 0.25 }}
               onClick={scrollToTop}
-              className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-50 bg-black text-white p-3 rounded-full shadow-lg hover:bg-gray-800 transition-colors"
+              className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-50 bg-black dark:bg-white text-white dark:text-black p-3 rounded-full shadow-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors duration-300"
               aria-label="Back to top"
             >
               <ChevronUp className="w-5 h-5" />

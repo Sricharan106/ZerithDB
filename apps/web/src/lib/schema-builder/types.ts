@@ -23,4 +23,3 @@ export type SchemaEdge = {
   to: string; // node id
   label: string;
 };
-

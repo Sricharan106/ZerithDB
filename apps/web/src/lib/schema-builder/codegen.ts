@@ -37,9 +37,7 @@ function zodForField(field: SchemaField): string {
         // Keep common TS type expressions intact (generics/unions/namespaces, etc.)
         // but avoid emitting obviously-invalid or injectable content.
         const isValidTypeExpr =
-          custom.length > 0 &&
-          custom.length <= 200 &&
-          !/[\r\n;]/.test(custom);
+          custom.length > 0 && custom.length <= 200 && !/[\r\n;]/.test(custom);
 
         base = isValidTypeExpr ? `z.custom<${custom}>()` : "z.unknown()";
       }
@@ -57,7 +55,10 @@ export type GeneratedSchemaArtifacts = {
   typescript: string;
 };
 
-export function generateSchemaArtifacts(nodes: SchemaNode[], edges: SchemaEdge[]): GeneratedSchemaArtifacts {
+export function generateSchemaArtifacts(
+  nodes: SchemaNode[],
+  edges: SchemaEdge[]
+): GeneratedSchemaArtifacts {
   const sortedNodes = [...nodes].sort((a, b) => a.name.localeCompare(b.name));
   const sortedEdges = [...edges].sort((a, b) => a.label.localeCompare(b.label));
 
@@ -106,7 +107,7 @@ export function generateSchemaArtifacts(nodes: SchemaNode[], edges: SchemaEdge[]
   lines.push("");
   lines.push("export const app = createApp({");
   lines.push('  appId: "my-app",');
-  lines.push("  // sync: { signalingUrl: \"wss://signal.zerithdb.dev\" },");
+  lines.push('  // sync: { signalingUrl: "wss://signal.zerithdb.dev" },');
   lines.push("  // debug: { devtools: true },");
   lines.push("});");
   lines.push("");

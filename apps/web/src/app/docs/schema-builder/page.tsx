@@ -6,10 +6,7 @@ import { ArrowLeft, Copy, Check, Plus, Link2, Trash2 } from "lucide-react";
 import type { SchemaEdge, SchemaField, SchemaNode } from "@/lib/schema-builder/types";
 import { generateSchemaArtifacts } from "@/lib/schema-builder/codegen";
 
-type Selected =
-  | { kind: "none" }
-  | { kind: "node"; id: string }
-  | { kind: "edge"; id: string };
+type Selected = { kind: "none" } | { kind: "node"; id: string } | { kind: "edge"; id: string };
 
 function uid(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
@@ -168,23 +165,23 @@ export default function SchemaBuilderPage() {
 
   const onNodeClick = useCallback(
     (e: React.MouseEvent, nodeId: string) => {
-    e.stopPropagation();
-    if (connectFrom) {
-      if (connectFrom === nodeId) return;
-      const newEdge: SchemaEdge = {
-        id: uid("edge"),
-        from: connectFrom,
-        to: nodeId,
-        label: "rel",
-      };
-      setEdges((prev) => [...prev, newEdge]);
-      setSelected({ kind: "edge", id: newEdge.id });
-      setConnectFrom(null);
-      return;
-    }
-    setSelected((prev) =>
-      prev.kind === "node" && prev.id === nodeId ? prev : { kind: "node", id: nodeId }
-    );
+      e.stopPropagation();
+      if (connectFrom) {
+        if (connectFrom === nodeId) return;
+        const newEdge: SchemaEdge = {
+          id: uid("edge"),
+          from: connectFrom,
+          to: nodeId,
+          label: "rel",
+        };
+        setEdges((prev) => [...prev, newEdge]);
+        setSelected({ kind: "edge", id: newEdge.id });
+        setConnectFrom(null);
+        return;
+      }
+      setSelected((prev) =>
+        prev.kind === "node" && prev.id === nodeId ? prev : { kind: "node", id: nodeId }
+      );
     },
     [connectFrom]
   );
@@ -379,7 +376,9 @@ export default function SchemaBuilderPage() {
                     value={selectedNode.name}
                     onChange={(e) =>
                       setNodes((prev) =>
-                        prev.map((n) => (n.id === selectedNode.id ? { ...n, name: e.target.value } : n))
+                        prev.map((n) =>
+                          n.id === selectedNode.id ? { ...n, name: e.target.value } : n
+                        )
                       )
                     }
                     className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -491,7 +490,9 @@ export default function SchemaBuilderPage() {
                                     : {
                                         ...n,
                                         fields: n.fields.map((ff) =>
-                                          ff.id === f.id ? { ...ff, customType: e.target.value } : ff
+                                          ff.id === f.id
+                                            ? { ...ff, customType: e.target.value }
+                                            : ff
                                         ),
                                       }
                                 )
@@ -514,7 +515,9 @@ export default function SchemaBuilderPage() {
                                       : {
                                           ...n,
                                           fields: n.fields.map((ff) =>
-                                            ff.id === f.id ? { ...ff, required: e.target.checked } : ff
+                                            ff.id === f.id
+                                              ? { ...ff, required: e.target.checked }
+                                              : ff
                                           ),
                                         }
                                   )
@@ -567,7 +570,9 @@ export default function SchemaBuilderPage() {
                   value={selectedEdge.label}
                   onChange={(e) =>
                     setEdges((prev) =>
-                      prev.map((ed) => (ed.id === selectedEdge.id ? { ...ed, label: e.target.value } : ed))
+                      prev.map((ed) =>
+                        ed.id === selectedEdge.id ? { ...ed, label: e.target.value } : ed
+                      )
                     )
                   }
                   className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -578,8 +583,8 @@ export default function SchemaBuilderPage() {
 
             {selected.kind === "none" && (
               <div className="text-sm text-muted-foreground">
-                Tip: click a collection to edit it, or use <span className="font-mono">Relation</span>{" "}
-                then click source → target.
+                Tip: click a collection to edit it, or use{" "}
+                <span className="font-mono">Relation</span> then click source → target.
               </div>
             )}
 
@@ -598,8 +603,8 @@ export default function SchemaBuilderPage() {
                 <code>{artifacts.typescript}</code>
               </pre>
               <p className="text-xs text-muted-foreground mt-2">
-                Note: this generator emits <span className="font-mono">zod</span> usage for validation, but
-                does not change ZerithDB runtime behavior.
+                Note: this generator emits <span className="font-mono">zod</span> usage for
+                validation, but does not change ZerithDB runtime behavior.
               </p>
             </div>
           </div>

@@ -1,12 +1,11 @@
 import { createApp } from "zerithdb-sdk";
-import type { Document, Identity, SyncState, ZerithDBConfig } from "zerithdb-sdk";
+import type { Document, SyncState } from "zerithdb-sdk";
 import type {
   ClientToWorkerMessage,
   DisposeMessage,
   InitMessage,
   RequestMessage,
   SubscribeMessage,
-  UnsubscribeMessage,
   WorkerToClientMessage,
 } from "./shared-worker-protocol.js";
 import { serializeError } from "./shared-worker-protocol.js";
