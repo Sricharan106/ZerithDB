@@ -16,9 +16,27 @@ export type DocumentMetadata = {
 /** Base document shape. All stored documents have system fields added automatically. */
 export type Document<T extends Record<string, any> = Record<string, any>> = T & DocumentMetadata;
 
+type RegexFilter =
+  | { $regex: RegExp | string }
+  | {
+      $regex: RegExp | string;
+      /** Regex flags (for example: "i", "gm") */
+      $flags?: string;
+      /** Alias for $flags for MongoDB-like ergonomics */
+      $options?: string;
+    };
+
 /**
  * MongoDB-style query filter operators.
  * Nested object fields are matched by equality.
+ *
+ * @example
+ * // Native RegExp
+ * { title: { $regex: /meeting/i } }
+ *
+ * @example
+ * // String pattern with flags
+ * { title: { $regex: "meeting", $flags: "i" } }
  */
 type QueryFilterValue<T> =
   | T
