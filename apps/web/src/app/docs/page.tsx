@@ -372,7 +372,7 @@ export default function DocsPage() {
                   "px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px " +
                   (activeId === fw.id
                     ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border")
+                    : "border-transparent text-slate-600 dark:text-muted-foreground hover:text-foreground hover:border-border")
                 }
               >
                 {fw.name}
@@ -590,6 +590,12 @@ export default function DocsPage() {
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Playground
+          </Link>
+          <Link
+            href="/docs/schema-builder"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Schema Builder
           </Link>
           <a
             href="https://github.com/Zerith-Labs/ZerithDB"

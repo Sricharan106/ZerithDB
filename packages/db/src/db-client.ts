@@ -4,6 +4,7 @@ import type {
   ZerithDBConfig,
   Document,
   QueryFilter,
+  QueryOptions,
   InsertResult,
   UpdateSpec,
 } from "zerithdb-core";
@@ -23,8 +24,23 @@ import type { GraphNode, GraphEdge } from "zerithdb-core";
 export class CollectionClient<T extends Record<string, any> = Record<string, any>> {
   constructor(
     private readonly table: Table<Document<T>>,
-    private readonly collectionName: string
+    private readonly collectionName: string,
+    private readonly auth?: any
   ) {}
+
+  private async checkBiometric(operationDescription: string): Promise<void> {
+    if (this.auth?.biometric?.isBiometricRequiredForDB()) {
+      const authorized = await this.auth.biometric.promptBiometric(
+        `Authorize sensitive database operation: ${operationDescription} in collection "${this.collectionName}"`
+      );
+      if (!authorized) {
+        throw new ZerithDBError(
+          ErrorCode.AUTH_SIGN_FAILED,
+          "Database operation cancelled or biometric authentication failed."
+        );
+      }
+    }
+  }
 
   /**
    * Subscribe to changes in the collection.
@@ -121,6 +137,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     if (document === null || document === undefined) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document cannot be null or undefined");
     }
+    await this.checkBiometric("Insert Document");
     const now = Date.now();
     const id = uuidv7();
 
@@ -154,6 +171,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Documents array cannot be empty");
     }
 
+    await this.checkBiometric("Bulk Insert Documents");
     for (const doc of documents) {
       this.validateDocument(doc);
     }
@@ -187,17 +205,47 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * const high = await todos.find({ priority: { $gte: 3 } });
    * ```
    */
-
-  async find(filter: QueryFilter<T> = {}): Promise<Document<T>[]> {
-    this.validateFilter(filter);
+  async find(filter: QueryFilter<T> = {}, options: QueryOptions<T> = {}): Promise<Document<T>[]> {
+        this.validateFilter(filter);
 
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
       `Failed to query collection "${this.collectionName}"`,
       async () => {
-        const all = await this.table.toArray();
         const compiledFilter = this.precompileRegexes(filter);
-        return all.filter((doc) => this.matchesFilter(doc, compiledFilter));
+        const results: Document<T>[] = [];
+
+        await this.table.each((doc) => {
+          if (this.matchesFilter(doc, compiledFilter)) {
+            results.push(doc);
+          }
+        });
+
+        if (options.sort) {
+          const { field, order = "asc" } = options.sort;
+
+          results.sort((a, b) => {
+            const aValue = a[field];
+            const bValue = b[field];
+
+            if (aValue === bValue) return 0;
+
+            if (aValue == null) return 1;
+            if (bValue == null) return -1;
+
+            const comparison = String(aValue).localeCompare(String(bValue), undefined, {
+              numeric: true,
+              sensitivity: "base",
+            });
+
+            return order === "desc" ? -comparison : comparison;
+          });
+        }
+
+        const skip = options.skip ?? options.offset ?? 0;
+        const limit = options.limit ?? Number.POSITIVE_INFINITY;
+
+        return results.slice(skip, skip + limit);
       }
     );
   }
@@ -248,7 +296,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         "Update spec must contain non-empty $set or $unset"
       );
     }
-
+    await this.checkBiometric("Update Documents");
     return wrapIDBOperation(
       ErrorCode.DB_WRITE_FAILED,
       `Failed to update documents in "${this.collectionName}"`,
@@ -276,6 +324,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   async delete(filter: QueryFilter<T>): Promise<number> {
     this.validateFilter(filter);
 
+    await this.checkBiometric("Delete Documents");
     return wrapIDBOperation(
       ErrorCode.DB_DELETE_FAILED,
       `Failed to delete documents from "${this.collectionName}"`,
@@ -298,6 +347,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    */
 
   async clearAll(): Promise<void> {
+    await this.checkBiometric("Clear Collection");
     return wrapIDBOperation(
       ErrorCode.DB_DELETE_FAILED,
       `Failed to clear collection "${this.collectionName}"`,
@@ -588,11 +638,14 @@ export class DbClient {
 
   private readonly graphs = new Map<string, GraphClient<any>>();
 
-  constructor(config: ZerithDBConfig) {
+  constructor(
+    config: ZerithDBConfig,
+    private readonly auth?: any
+  ) {
     if (!config?.appId || typeof config.appId !== "string") {
       throw new ZerithDBError(ErrorCode.DB_INIT_FAILED, "Invalid appId provided");
     }
-
+      
     this.appId = config.appId;
     this.dexie = new ZerithDBDexie(config.appId);
   }
@@ -607,8 +660,10 @@ export class DbClient {
 
     if (!this.collections.has(name)) {
       const table = this.dexie.ensureCollection(name);
-
-      this.collections.set(name, new CollectionClient<T>(table as Table<Document<T>>, name));
+      this.collections.set(
+        name,
+        new CollectionClient<T>(table as Table<Document<T>>, name, this.auth)
+      );
     }
 
     return this.collections.get(name) as CollectionClient<T>;
@@ -658,6 +713,18 @@ export class DbClient {
    * If options.collections is omitted, it exports ALL collections found in IndexedDB.
    */
   async exportSnapshot(options: BackupExportOptions = {}): Promise<BackupSnapshot> {
+    if (this.auth?.biometric?.isBiometricRequiredForDB()) {
+      const authorized = await this.auth.biometric.promptBiometric(
+        "Authorize sensitive operation: Export full database backup snapshot"
+      );
+      if (!authorized) {
+        throw new ZerithDBError(
+          ErrorCode.AUTH_SIGN_FAILED,
+          "Database export cancelled or biometric authentication failed."
+        );
+      }
+    }
+
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
       "Failed to export local backup snapshot",

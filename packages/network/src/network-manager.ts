@@ -195,21 +195,57 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
    * Broadcast a message to all connected peers.
    */
   broadcast(message: { type: string; payload: string | Uint8Array }): void {
-    const data = JSON.stringify(message);
-    for (const [, peer] of this.peers) {
-      if (peer.connected) {
-        peer.send(data);
-      }
-    }
+    this.signAndSendAsync(message, null);
   }
 
   /**
    * Send a message to a specific peer.
    */
   sendTo(peerId: PeerId, message: { type: string; payload: string | Uint8Array }): void {
-    const peer = this.peers.get(peerId);
-    if (peer?.connected) {
-      peer.send(JSON.stringify(message));
+    this.signAndSendAsync(message, peerId);
+  }
+
+  private async signAndSendAsync(
+    message: { type: string; payload: string | Uint8Array },
+    targetPeerId: PeerId | null
+  ): Promise<void> {
+    try {
+      let finalMessage = { ...message } as any;
+
+      if (this.auth?.biometric?.isBiometricEnabled()) {
+        const payloadBytes =
+          typeof message.payload === "string"
+            ? new TextEncoder().encode(message.payload)
+            : message.payload;
+
+        const sigBytes = await this.auth.biometric.sign(payloadBytes);
+        const signature = bytesToHex(sigBytes);
+        const senderPublicKey = await this.auth.biometric.getPublicKeyHex();
+
+        finalMessage = {
+          type: message.type,
+          payload: message.payload,
+          signature,
+          senderPublicKey,
+        };
+      }
+
+      const data = JSON.stringify(finalMessage);
+
+      if (targetPeerId === null) {
+        for (const [, peer] of this.peers) {
+          if (peer.connected) {
+            peer.send(data);
+          }
+        }
+      } else {
+        const peer = this.peers.get(targetPeerId);
+        if (peer?.connected) {
+          peer.send(data);
+        }
+      }
+    } catch (err) {
+      console.error("[ZerithDB] Failed to sign/send WebRTC message:", err);
     }
   }
 
@@ -479,15 +515,7 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
     });
 
     peer.on("data", (data: Uint8Array | string) => {
-      try {
-        const msg = JSON.parse(
-          typeof data === "string" ? data : new TextDecoder().decode(data)
-        ) as { type: string; payload: string | Uint8Array };
-        this.handlePeerMessage(remotePeerId, msg);
-        this.emit("message", { ...msg, from: remotePeerId });
-      } catch {
-        // Ignore malformed messages
-      }
+      this.handleInboundDataAsync(remotePeerId, data);
     });
 
     peer.on("stream", (stream: MediaStream) => {
@@ -723,4 +751,69 @@ export class NetworkManager extends EventEmitter<NetworkEvents> {
       void this.connect(roomId);
     }, backoff + jitter);
   }
+
+  private async handleInboundDataAsync(
+    remotePeerId: PeerId,
+    data: Uint8Array | string
+  ): Promise<void> {
+    try {
+      const msgStr = typeof data === "string" ? data : new TextDecoder().decode(data);
+      const msg = JSON.parse(msgStr) as {
+        type: string;
+        payload: string | Uint8Array;
+        signature?: string;
+        senderPublicKey?: string;
+      };
+
+      if (this.auth?.biometric?.isBiometricRequiredForSync()) {
+        if (!msg.signature || !msg.senderPublicKey) {
+          console.warn(`[ZerithDB] Dropped unsigned WebRTC message from peer ${remotePeerId}`);
+          return;
+        }
+        const payloadBytes =
+          typeof msg.payload === "string"
+            ? new TextEncoder().encode(msg.payload)
+            : msg.payload instanceof Uint8Array
+              ? msg.payload
+              : new Uint8Array(msg.payload as any);
+
+        const sigBytes = hexToBytes(msg.signature);
+        const isValid = await this.auth.biometric.verify(
+          payloadBytes,
+          sigBytes,
+          msg.senderPublicKey
+        );
+        if (!isValid) {
+          console.error(
+            `[ZerithDB] Invalid biometric signature on WebRTC message from peer ${remotePeerId}`
+          );
+          return;
+        }
+      }
+
+      this.handlePeerMessage(remotePeerId, msg);
+      this.emit("message", { ...msg, from: remotePeerId });
+    } catch (err) {
+      // Ignore malformed messages
+    }
+  }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  if (typeof hex !== "string" || hex.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(hex)) {
+    throw new Error(`hexToBytes() received an invalid hex string: "${hex}".`);
+  }
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  }
+  return bytes;
 }
