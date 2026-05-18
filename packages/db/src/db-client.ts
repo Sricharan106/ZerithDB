@@ -25,6 +25,10 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   private readonly indexes = new Map<string, IndexState<T>>();
   private readonly docIndexKeys = new Map<DocumentId, Map<string, unknown>>();
 
+  // FIX 1: Declare `schema` and `auth` as class properties (were used but never declared)
+  private schema: ZerithSchema<T> | undefined = undefined;
+  private auth?: { biometric?: { isBiometricRequiredForDB(): boolean; promptBiometric(msg: string): Promise<boolean> } };
+
   constructor(
     private readonly table: Table<Document<T>>,
     private readonly collectionName: string,
@@ -53,7 +57,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * @param callback - Function called with the updated list of all documents
    * @returns An unsubscribe function
    */
-
   subscribe(callback: (documents: Document<T>[]) => void): () => void {
     const observable = liveQuery(() => this.find());
 
@@ -130,7 +133,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * - inserts if doc doesn't exist
    * - updates if doc already exists
    */
-
   async upsert(document: Partial<T> & { _id?: string }): Promise<InsertResult> {
     if (document === null || document === undefined) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Document cannot be null or undefined");
@@ -163,7 +165,8 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         return { id };
       }
     );
-  };
+  }
+
   /*
    * Internal: refresh the underlying Dexie table reference after a schema change.
    */
@@ -372,7 +375,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * Insert a new document into the collection.
    * Automatically assigns `_id`, `_createdAt`, and `_updatedAt`.
    */
-
   async insert(document: T): Promise<InsertResult> {
     this.validateDocument(document);
 
@@ -408,7 +410,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
   /**
    * Insert multiple documents in a single atomic operation.
    */
-
   async insertMany(documents: T[]): Promise<InsertResult[]> {
     if (!Array.isArray(documents)) {
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Documents must be an array");
@@ -418,11 +419,14 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       throw new ZerithDBError(ErrorCode.DB_WRITE_FAILED, "Documents array cannot be empty");
     }
 
+    // FIX 3: The original for-loop incorrectly swallowed the rest of the method body.
+    // validateDocument loop must close before proceeding to the rest of the method.
     for (const doc of documents) {
       this.validateDocument(doc);
+    }
+
     await this.checkBiometric("Bulk Insert Documents");
-    
-    // Validate each document before writing
+
     for (let i = 0; i < documents.length; i++) {
       const doc = documents[i];
       if (doc === null || doc === undefined) {
@@ -460,27 +464,27 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       );
     }
   }
-  }
 
   /**
    * Find documents matching a filter.
    * All filter fields are ANDed together.
    *
    * @example
-   * '''
-   *  typescript
+   * ```typescript
    * const active = await todos.find({ done: false });
    * const high = await todos.find({ priority: { $gte: 3 } });
-   * '''
-  */
-
+   * ```
+   */
+  // FIX 4: wrapIDBOperation callback was closed prematurely, leaving the index-path
+  // code and the catch block dangling outside it as unreachable/invalid syntax.
+  // Reconstructed as a proper try/catch with index fast-path and full-scan fallback.
   async find(filter: QueryFilter<T> = {}): Promise<Document<T>[]> {
     this.validateFilter(filter);
 
-    return wrapIDBOperation(
-      ErrorCode.DB_READ_FAILED,
-      `Failed to query collection "${this.collectionName}"`,
-      async () => {
+    try {
+      const indexMatch = this.selectIndex(filter);
+
+      if (!indexMatch) {
         const all = await this.table.toArray();
         return all.filter((doc) => this.matchesFilter(doc, filter));
       }
@@ -504,11 +508,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         { cause: err }
       );
     }
+  }
 
   /**
    * Find a single document by its `_id`.
    */
-
   async findById(id: string): Promise<Document<T> | undefined> {
     if (!id || typeof id !== "string") {
       throw new ZerithDBError(ErrorCode.DB_READ_FAILED, "Document id must be a non-empty string");
@@ -533,7 +537,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * Update documents matching a filter.
    * Returns the number of updated documents.
    */
-
   async update(filter: QueryFilter<T>, spec: UpdateSpec<T>): Promise<number> {
     this.validateFilter(filter);
 
@@ -558,8 +561,14 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         }
 
         const now = Date.now();
+        const updated = matches.map((doc) => this.applyUpdateSpec(doc, spec, now));
 
-        await this.table.bulkPut(matches.map((doc) => this.applyUpdateSpec(doc, spec, now)));
+        // FIX 12: Keep in-memory indexes in sync after update
+        for (let i = 0; i < matches.length; i++) {
+          this.applyIndexUpdate(matches[i]!, updated[i]!);
+        }
+
+        await this.table.bulkPut(updated);
 
         return matches.length;
       }
@@ -570,26 +579,26 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
    * Delete documents matching a filter.
    * Returns the number of deleted documents.
    */
-
+  // FIX 5 & 6: wrapIDBOperation callback was closed early, leaving a duplicate
+  // bulkDelete call and an orphaned catch block outside it. The method also never
+  // closed its own brace, merging with clearAll. Reconstructed as a clean try/catch.
   async delete(filter: QueryFilter<T>): Promise<number> {
     this.validateFilter(filter);
 
     await this.db.saveUndoSnapshot();
 
-    return wrapIDBOperation(
-      ErrorCode.DB_DELETE_FAILED,
-      `Failed to delete documents from "${this.collectionName}"`,
-      async () => {
-        const matches = await this.find(filter);
+    try {
+      const matches = await this.find(filter);
 
-        if (matches.length === 0) {
-          throw new ZerithDBError(ErrorCode.DB_DELETE_FAILED, "No matching documents found");
-        }
-
-        await this.table.bulkDelete(matches.map((d) => d._id));
-
-        return matches.length;
+      if (matches.length === 0) {
+        throw new ZerithDBError(ErrorCode.DB_DELETE_FAILED, "No matching documents found");
       }
+
+      // FIX 12: Keep in-memory indexes in sync after delete
+      for (const doc of matches) {
+        this.applyIndexDelete(doc);
+      }
+
       await this.table.bulkDelete(matches.map((d) => d._id));
       return matches.length;
     } catch (err) {
@@ -600,11 +609,11 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
         { cause: err }
       );
     }
+  }
 
   /**
    * Delete every document in the collection.
    */
-
   async clearAll(): Promise<void> {
     await this.db.saveUndoSnapshot();
 
@@ -646,7 +655,6 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
 
       // Simple equality filters - filter in memory (fast enough for most datasets)
       if (!hasComplexOps) {
-        // Fix: Change type from Table to any or Collection
         let collection: any = this.table;
 
         for (const [key, value] of Object.entries(filter)) {
@@ -686,7 +694,13 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     return this.blobManager.download(cid);
   }
 
-  private matchesFilter(doc: Document<T>, filter: QueryFilter<T>): boolean {
+  // FIX 10: Added optional `comparators` parameter to match the 3-arg call sites in `find`.
+  // Previously the parameter was absent from the signature but referenced inside the body.
+  private matchesFilter(
+    doc: Document<T>,
+    filter: QueryFilter<T>,
+    comparators?: Map<string, IndexComparator<unknown>>
+  ): boolean {
     const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex"];
 
     for (const [key, condition] of Object.entries(filter)) {
@@ -694,8 +708,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       const comparator = comparators?.get(key);
 
       // Primitive equality matching
-      // Example:
-      // { age: 10 }
+      // Example: { age: 10 }
       if (condition === null || typeof condition !== "object" || condition instanceof RegExp) {
         if (fieldValue !== condition) {
           return false;
@@ -716,8 +729,7 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
       const isOperatorObject = Object.keys(conditions).some((k) => k.startsWith("$"));
 
       // Deep object equality
-      // Example:
-      // { profile: { name: "john" } }
+      // Example: { profile: { name: "john" } }
       if (!isOperatorObject) {
         if (JSON.stringify(fieldValue) !== JSON.stringify(condition)) {
           return false;
@@ -785,16 +797,26 @@ export class CollectionClient<T extends Record<string, any> = Record<string, any
     return true;
   }
 
+  // FIX 11: `$unset` was validated for in `update()` but completely ignored here.
+  // Now correctly removes the listed fields from the document.
   private applyUpdateSpec(
     doc: Document<T>,
     spec: UpdateSpec<T>,
     now: number
   ): Document<T> {
-    return {
+    const updated = {
       ...doc,
       ...(spec.$set ?? {}),
       _updatedAt: now,
     };
+
+    if (spec.$unset) {
+      for (const key of Object.keys(spec.$unset)) {
+        delete (updated as Record<string, any>)[key];
+      }
+    }
+
+    return updated;
   }
 }
 
@@ -819,26 +841,14 @@ class ZerithDBDexie extends Dexie {
    * @param name - The collection name to create or retrieve
    * @returns A promise that resolves to the Dexie {@link Table} handle for the collection
    */
-  async ensureCollection(name: string): Table {
+  // FIX 7: Return type was `Table` (missing Promise wrapper) for an async method.
+  async ensureCollection(name: string): Promise<Table> {
     if (!name || typeof name !== "string" || !name.trim()) {
       throw new ZerithDBError(ErrorCode.DB_INIT_FAILED, "Collection name cannot be empty");
     }
 
     if (!this.tableMap.has(name)) {
-      this._currentSchema[name] = "_id, _createdAt, _updatedAt";
-
-      // We must increment the version for every new collection added dynamically
-      const nextVersion = Math.max(this.verno, this._pendingVersion) + 1;
-
-      this._pendingVersion = nextVersion;
-
-      if (this.isOpen()) {
-        this.close();
-      }
-
-      this.version(nextVersion).stores(this._currentSchema);
-
-      this.tableMap.set(name, this.table(name));
+      await this._performSchemaUpgrade(name);
     }
 
     return this.tableMap.get(name)!;
@@ -882,7 +892,7 @@ export class DbClient {
 
   private readonly blobManager: BlobManager;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  
+
   private readonly collections = new Map<string, CollectionClient<any>>();
 
   private readonly undoHistory: BackupSnapshot[] = [];
@@ -900,6 +910,8 @@ export class DbClient {
     this.blobManager = new BlobManager(config.db);
   }
 
+  // FIX 8: CollectionClient was constructed with 3 args but its constructor requires 4.
+  // `this.blobManager` was missing as the fourth argument.
   collection<T extends Record<string, any>>(name: string): CollectionClient<T> {
     if (!name || typeof name !== "string" || !name.trim()) {
       throw new ZerithDBError(
@@ -911,7 +923,10 @@ export class DbClient {
     if (!this.collections.has(name)) {
       const table = this.dexie.ensureCollection(name);
 
-      this.collections.set(name, new CollectionClient<T>(table as Table<Document<T>>, name, this));
+      this.collections.set(
+        name,
+        new CollectionClient<T>(table as unknown as Table<Document<T>>, name, this, this.blobManager)
+      );
     }
 
     return this.collections.get(name) as CollectionClient<T>;
@@ -953,6 +968,8 @@ export class DbClient {
    * If options.collections is omitted, it exports ALL collections found in IndexedDB.
    * undo and redo stack Stores snapshots BEFORE/AFTER mutations.
    */
+  // FIX 9: Stray `if (!this.collections.has(name))` block after the return statement
+  // (dead code left over from a refactor) has been removed.
   async exportSnapshot(options: BackupExportOptions = {}): Promise<BackupSnapshot> {
     return wrapIDBOperation(
       ErrorCode.DB_READ_FAILED,
@@ -963,7 +980,7 @@ export class DbClient {
         const collections: BackupSnapshot["collections"] = {};
 
         for (const name of collectionNames) {
-          const table = this.dexie.ensureCollection(name);
+          const table = await this.dexie.ensureCollection(name);
 
           collections[name] = (await table.toArray()) as Document<Record<string, any>>[];
         }
@@ -976,14 +993,6 @@ export class DbClient {
         };
       }
     );
-
-    if (!this.collections.has(name)) {
-      const table = this.dexie.ensureCollection(name);
-      this.collections.set(
-        name,
-        new CollectionClient<T>(table as Table<Document<T>>, name, this.blobManager)
-      );
-    }
   }
 
   async dispose(): Promise<void> {
@@ -1008,12 +1017,12 @@ export class DbClient {
 
   private async restoreSnapshot(snapshot: BackupSnapshot): Promise<void> {
     for (const name of this.allCollectionNames()) {
-      const table = this.dexie.ensureCollection(name);
+      const table = await this.dexie.ensureCollection(name);
       await table.clear();
     }
 
     for (const [collectionName, docs] of Object.entries(snapshot.collections)) {
-      const table = this.dexie.ensureCollection(collectionName);
+      const table = await this.dexie.ensureCollection(collectionName);
 
       if (docs.length > 0) {
         await table.bulkPut(docs);
